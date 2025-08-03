@@ -3,7 +3,7 @@ import copy
 import itertools
 import random
 
-from . import utils
+from ztxexp import utils
 
 
 class ExpManager:
@@ -61,7 +61,7 @@ class ExpManager:
             return self
 
         # Start with the current base configurations
-        variant_configs = list(self._base_configs)
+        variant_configs = []
 
         for key, values in variant_space.items():
             for value in values:

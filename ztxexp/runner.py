@@ -12,7 +12,7 @@ import psutil
 # It can be a more robust choice than the standard ProcessPoolExecutor.
 from joblib import Parallel, delayed
 
-from . import utils
+from ztxexp import utils
 
 # Define a constant for the success marker file for consistency
 SUCCESS_MARKER = '_SUCCESS'

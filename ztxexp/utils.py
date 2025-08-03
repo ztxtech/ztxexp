@@ -4,9 +4,12 @@ import hashlib
 import json
 import logging
 import os
+import pathlib
+import shutil
 import sys
 import time
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 
 import dill
@@ -201,3 +204,41 @@ def pretty_print_dict(d: dict, items_per_line: int = 3):
                 line += f"| \033[92m {key:<{key_width}} \033[94m{str(value):>{val_width}} \033[0m"
         line += "|"
         print(line)
+
+
+# --- Directory and File Operations ---
+
+def create_dir(path: str):
+    """
+    Create a directory if it does not exist.
+    """
+    os.makedirs(path, exist_ok=True)
+
+
+def delete_dir(path: str):
+    """
+    Delete a directory and all its contents.
+    """
+    if os.path.exists(path) and os.path.isdir(path):
+        shutil.rmtree(path)
+        print(f'Deleted directory: {path}')
+
+
+def get_subdirectories(path: str) -> list[pathlib.Path]:
+    """
+    Get all subdirectories in a given path.
+    """
+    p = pathlib.Path(path)
+    if not p.exists() or not p.is_dir():
+        return []
+    return [folder for folder in p.iterdir() if folder.is_dir()]
+
+
+def get_file_creation_time(file_path: str) -> str:
+    """
+    Get the creation time of a file formatted as a string.
+    """
+    path = pathlib.Path(file_path)
+    timestamp = path.stat().st_ctime
+    creation_time = datetime.fromtimestamp(timestamp)
+    return creation_time.strftime("%Y/%m/%d-%H:%M:%S")

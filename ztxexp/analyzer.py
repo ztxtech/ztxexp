@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import utils
-from .runner import SUCCESS_MARKER  # Import the constant
+from ztxexp import utils
+from ztxexp.runner import SUCCESS_MARKER  # Import the constant
 
 
 class ResultAnalyzer:
