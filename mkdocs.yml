@@ -1,6 +1,6 @@
 site_name: ztxexp Documentation
 theme:
-  name: readthedocs # 使用流行的 Material 主题
+  name: material # 使用流行的 Material 主题
 
 plugins:
   - search
