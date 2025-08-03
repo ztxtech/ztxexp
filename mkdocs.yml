@@ -1,0 +1,15 @@
+site_name: ztxexp Documentation
+theme:
+  name: material # 使用流行的 Material 主题
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+
+nav:
+  - 'Home': 'index.md'
+  - 'API Reference': 'api.md'

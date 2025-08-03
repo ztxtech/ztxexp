@@ -1,5 +1,10 @@
 # ztxexp
 
+[![GitHub Stars](https://img.shields.io/github/stars/ztxtech/ztxexp?style=social)](https://github.com/ztxtech/ztxexp/)
+[![PyPI version](https://badge.fury.io/py/ztxexp.svg)](https://badge.fury.io/py/ztxexp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Versions](https://img.shields.io/pypi/pyversions/ztxexp.svg)](https://pypi.org/project/ztxexp)
+
 **ztxexp** (ZTX-Experiment)
 是一个轻量级、零依赖（除Python标准库外）且功能强大的Python工具库，旨在将您从繁琐的计算实验管理中解放出来。它特别适用于机器学习、深度学习和任何需要进行大量参数搜索与结果分析的研究场景。
 
