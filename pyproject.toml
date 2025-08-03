@@ -3,7 +3,7 @@
 # 1. 构建系统配置 (Build System Configuration)
 #    - 告诉pip如何构建你的项目。这部分通常是固定的。
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 # 2. 项目元数据 (Project Metadata)
