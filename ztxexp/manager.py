@@ -1,3 +1,13 @@
+"""
+Experiment Configuration Manager
+================================
+
+This module provides tools for managing experiment configurations, 
+including grid search, variants, filtering, modification, and resuming from completed runs.
+
+Classes:
+    ExpManager: Main class for managing experiment configurations.
+"""
 import argparse
 import copy
 import itertools
@@ -160,7 +170,6 @@ class ExpManager:
 
     def _load_completed_configs(self, results_path: str) -> list[dict]:
         """Loads all 'args.json' from subfolders as completed experiments."""
-        # ... (implementation from previous answer is unchanged) ...
         folders = utils.get_subdirectories(results_path)
         completed_configs = []
         for folder in folders:
@@ -173,7 +182,6 @@ class ExpManager:
 
     def _are_configs_equal(self, config1: dict, config2: dict, ignore_keys: list[str]) -> bool:
         """Compares two configuration dictionaries."""
-        # ... (implementation from previous answer is unchanged) ...
         keys1 = set(config1.keys()) - set(ignore_keys)
         keys2 = set(config2.keys()) - set(ignore_keys)
 

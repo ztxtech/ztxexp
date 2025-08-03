@@ -1,3 +1,14 @@
+"""
+Experiment Environment Setup
+============================
+
+This module provides utilities for setting up the experiment environment,
+including GPU initialization, random seed setting, and process priority management.
+
+Functions:
+    init_torch_env: Initializes the PyTorch environment with specified parameters.
+    set_process_priority: Sets the priority of the current process.
+"""
 import os
 import random
 

@@ -1,3 +1,14 @@
+"""
+Experiment Result Analyzer
+==========================
+
+This module provides tools for analyzing experiment results, including
+aggregating results into DataFrames, saving to CSV/Excel files, and 
+cleaning up result directories.
+
+Classes:
+    ResultAnalyzer: Main class for analyzing experiment results.
+"""
 import shutil
 from pathlib import Path
 
@@ -8,7 +19,6 @@ from ztxexp.runner import SUCCESS_MARKER  # Import the constant
 
 
 class ResultAnalyzer:
-    # ... (__init__ is unchanged) ...
     def __init__(self, results_path: str):
         self.results_path = Path(results_path)
         if not self.results_path.exists():

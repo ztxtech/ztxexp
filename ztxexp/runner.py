@@ -1,3 +1,13 @@
+"""
+Experiment Runner
+=================
+
+This module provides tools for running experiments, including
+sequential and parallel execution modes.
+
+Classes:
+    ExpRunner: Main class for running experiments.
+"""
 import argparse
 import datetime
 import logging

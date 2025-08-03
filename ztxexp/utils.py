@@ -1,3 +1,26 @@
+"""
+General Utilities
+=================
+
+This module provides general utility functions used across the framework,
+including path management, logging, serialization, timing, hashing, and display formatting.
+
+Functions:
+    add_to_sys_path: Adds a directory to the Python system path.
+    setup_logger: Sets up a logger that writes to both a file and the console.
+    save_json: Saves a dictionary to a JSON file.
+    load_json: Loads a dictionary from a JSON file.
+    save_dill: Serializes and saves a Python object using dill.
+    load_dill: Loads and deserializes a Python object using dill.
+    save_torch_model: Saves a PyTorch model checkpoint.
+    load_torch_model: Loads a PyTorch model checkpoint.
+    timer: A context manager to time a block of code.
+    format_time_delta: Formats a duration in seconds into a human-readable string.
+    get_memory_usage: Returns the memory usage of the current process in MB.
+    config_to_hash: Creates a deterministic hash from a configuration dictionary.
+    pretty_print_namespace: Prints argparse.Namespace in a formatted and colorful way.
+    pretty_print_dict: Prints a dictionary in a formatted and colorful way.
+"""
 # ztxexp/utils.py
 
 import hashlib
