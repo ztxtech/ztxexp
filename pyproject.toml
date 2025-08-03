@@ -1,0 +1,72 @@
+# pyproject.toml
+
+# 1. 构建系统配置 (Build System Configuration)
+#    - 告诉pip如何构建你的项目。这部分通常是固定的。
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# 2. 项目元数据 (Project Metadata)
+#    - 这是关于你的包的核心信息，PyPI会展示这些内容。
+[project]
+name = "ztxexp"
+version = "0.1.0"   # 初始版本号
+authors = [
+    { name = "ztxtech", email = "ztxtech@foxmail.com" }, # 请替换为你的邮箱
+]
+description = "一个轻量、强大的Python库，旨在简化计算实验的管理、执行和分析。"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" } # 明确指出许可证在LICENSE文件中
+keywords = [
+    "experiment management",
+    "machine learning",
+    "deep learning",
+    "reproducibility",
+    "parameter search",
+    "data science",
+    "pytorch"
+]
+
+# PyPI上的分类器，帮助用户发现你的项目
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+# 项目依赖项
+dependencies = [
+    "torch",
+    "numpy",
+    "psutil",
+    "dill",
+    "joblib",
+    "pandas",
+]
+
+# 3. 项目链接 (Project URLs)
+#    - 在PyPI侧边栏显示的链接
+[project.urls]
+Homepage = "https://ztxtech.github.io/ztxexp/"
+Repository = "https://github.com/ztxtech/ztxexp"
+
+
+# 4. Setuptools 工具配置 (Tool Configuration)
+#    - 告诉setuptools如何找到你的包
+[tool.setuptools.packages.find]
+# 自动发现项目根目录下的所有包（例如 ztxexp/ 目录）
+# 假设你的目录结构是 project_root/ztxexp/__init__.py
+# 如果你的结构是 project_root/src/ztxexp/__init__.py,
+# 则需要改为 where = ["src"]
+where = ["."]
