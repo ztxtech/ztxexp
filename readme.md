@@ -6,7 +6,7 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/ztxexp.svg)](https://pypi.org/project/ztxexp)
 
 **ztxexp** (ZTX-Experiment)
-是一个轻量级、零依赖（除Python标准库外）且功能强大的Python工具库，旨在将您从繁琐的计算实验管理中解放出来。它特别适用于机器学习、深度学习和任何需要进行大量参数搜索与结果分析的研究场景。
+是一个轻量级且功能强大的Python工具库，旨在将您从繁琐的计算实验管理中解放出来。它特别适用于机器学习、深度学习和任何需要进行大量参数搜索与结果分析的研究场景。
 
 由 [**ztxtech**](https://github.com/ztxtech) 开发，ztxexp 将实验设计的全流程——**配置生成、增量运行、结果分析、目录清理**
 ——封装在一套优雅流畅的API中。
