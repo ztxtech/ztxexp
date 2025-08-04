@@ -11,5 +11,11 @@ plugins:
             show_source: true
 
 nav:
-  - 'Home': 'index.md'
-  - 'API Reference': 'api.md'
+  - "Home": "index.md"
+  - "API Reference":
+      - "Overview": "api.md"
+      - "Manager": "api/manager.md"
+      - "Runner": "api/runner.md"
+      - "Analyzer": "api/analyzer.md"
+      - "Utils": "api/utils.md"
+      - "Environment": "api/environment.md"
