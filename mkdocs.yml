@@ -1,21 +1,38 @@
-site_name: ztxexp Documentation
+site_name: ztxexp PyPi package
+site_description: Documentation for the project
+repo_url: https://github.com/ztxtech/ztxexp
+repo_name: ztxtech/ztxexp
 theme:
-  name: material # 使用流行的 Material 主题
-
-plugins:
-  - search
-  - mkdocstrings:
-      handlers:
-        python:
-          options:
-            show_source: true
-
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+  - navigation.tabs
+  - navigation.sections
+  - toc.integrate
+  - navigation.top
+  - search.suggest
+  - search.highlight
+  - content.tabs.link
 nav:
-  - "Home": "index.md"
-  - "API Reference":
-      - "Overview": "api.md"
-      - "Manager": "api/manager.md"
-      - "Runner": "api/runner.md"
-      - "Analyzer": "api/analyzer.md"
-      - "Utils": "api/utils.md"
-      - "Environment": "api/environment.md"
+- Home: index.md
+- API Reference:
+  - Api Overview: api/index.md
+  - Analyzer: api/analyzer.md
+  - Environment: api/environment.md
+  - Manager: api/manager.md
+  - Runner: api/runner.md
+  - Utils: api/utils.md
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          show_source: true

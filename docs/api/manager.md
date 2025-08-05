@@ -1,3 +1,1 @@
-# Manager Module
-
 ::: ztxexp.manager
