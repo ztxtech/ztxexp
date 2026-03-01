@@ -23,7 +23,7 @@
 3. `ResultAnalyzer`: 负责聚合与清理。
 4. `ExperimentPipeline`: 一体化入口，适合绝大多数场景。
 
-v0.2 统一了 run 产物协议（schema v2）：
+v0.3 统一了 run 产物协议（schema v2）：
 
 - `config.json`
 - `run.json`
@@ -100,7 +100,7 @@ analyzer.to_csv("./results_demo/summary.csv", sort_by=["model", "lr"])
 会被判定为失败，并写入 `error.log`。
 
 2. 仍按旧版 `_SUCCESS` 判断成功
-v0.2 不再使用 `_SUCCESS`，以 `run.json` 为准。
+v0.3 不再使用 `_SUCCESS`，以 `run.json` 为准。
 
 3. 直接把大文件写在 run 根目录
 建议统一放到 `artifacts/`，便于后续清理和归档。
@@ -118,7 +118,7 @@ v0.2 不再使用 `_SUCCESS`，以 `run.json` 为准。
 
 本地入口：
 
-- 生成脚本：[`scripts/gen_ref_pages.py`](scripts/gen_ref_pages.py)
+- 生成脚本：[`scripts/gen_ref_pages.py`](https://github.com/ztxtech/ztxexp/blob/main/scripts/gen_ref_pages.py)
 - 构建产物：`docs/index.html` 与 `docs/reference/`（构建后生成）
 
 常用命令：

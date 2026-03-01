@@ -7,7 +7,7 @@ from ztxexp import RunContext
 
 
 def experiment_entrypoint(ctx: RunContext):
-    """Demo experiment function using v0.2 RunContext contract."""
+    """Demo experiment function using v0.3 RunContext contract."""
     lr = ctx.config["lr"]
     model = ctx.config["model"]
 

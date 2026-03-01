@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-03-02
+
+### Changed
+
+- Bumped project version baseline from `0.2.0` to `0.3.0`.
+- Updated package/runtime-facing version strings in metadata and examples.
+
 ## 0.2.0 - 2026-03-01
 
 ### Breaking

@@ -423,3 +423,7 @@ $RECYCLE.BIN/
 # - docs_src/: markdown source tracked in git
 # - docs/: rendered static site output (generated)
 /docs/
+
+# Codex local persistent instruction files (do not commit)
+/AGENTS.md
+/.codex/
