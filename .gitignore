@@ -426,4 +426,5 @@ $RECYCLE.BIN/
 
 # Codex local persistent instruction files (do not commit)
 /AGENTS.md
+/codex-trace.md
 /.codex/

@@ -18,9 +18,11 @@ theme:
     - navigation.top
     - search.suggest
     - search.highlight
+    - content.code.copy
 
 nav:
   - 首页: index.md
+  - 示例模板库: examples-lib/
   - API 参考: reference/
 
 plugins:
@@ -43,3 +45,5 @@ plugins:
 
 watch:
   - ztxexp
+  - examples
+  - README.md

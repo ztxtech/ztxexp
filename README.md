@@ -6,6 +6,14 @@
 
 `ztxexp` 是一个面向深度学习和大模型实验的抽象框架，目标是让实验迭代更快、更可复现。
 
+## NEW
+
+- 2026-03-02 01:25:15 (Asia/Shanghai): 新增 `examples/template_library` 可复制模板库（27 个场景模板），覆盖基础构建、并行调度、分析清理、ML、LLM、工程运维；并接入 MkDocs 自动生成页面（`示例模板库` 导航）。
+- 2026-03-02 01:02:25 (Asia/Shanghai): 新增 `codex-trace.md` 用于记录关键工作节点，并将其维护要求持久化到 `AGENTS.md`；同时将该文件加入 `.gitignore` 以避免提交本地 trace。
+- 2026-03-02 00:58:21 (Asia/Shanghai): 在 `ztxexp.utils` 新增 12 个高频实验工具函数，覆盖嵌套配置处理、配置差异比较、可读 run 命名、原子写入、JSONL 读写、重试调用与批处理切分。
+  - 新增函数：`flatten_dict`、`unflatten_dict`、`deep_merge_dicts`、`dict_diff`、`sanitize_filename`、`build_run_name`、`split_batches`、`write_text_atomic`、`save_json_atomic`、`append_jsonl`、`load_jsonl`、`retry_call`。
+- 规则（持久化）：后续每次对项目进行功能或行为更新时，都必须在本板块追加一条记录，包含“更新时间”和“更新内容”。
+
 ## 问题
 
 在真实项目里，实验常见痛点是：
@@ -23,7 +31,7 @@
 3. `ResultAnalyzer`: 负责聚合与清理。
 4. `ExperimentPipeline`: 一体化入口，适合绝大多数场景。
 
-v0.3 统一了 run 产物协议（schema v2）：
+v0.30 统一了 run 产物协议（schema v2）：
 
 - `config.json`
 - `run.json`
@@ -94,13 +102,29 @@ print(df[["run_id", "model", "lr", "score"]])
 analyzer.to_csv("./results_demo/summary.csv", sort_by=["model", "lr"])
 ```
 
+## 示例模板库（可复制）
+
+模板库目标是“复制后只改业务逻辑”，尽量覆盖常见 Python 实验场景：
+
+1. 基础构建：最小实验、网格+变体、多种子复现、manager/runner 解耦。
+2. 并行调度：`process_pool`、`joblib`、`dynamic`、非法配置 `SkipRun`。
+3. 结果分析：DataFrame 导出、CSV、透视表、清理策略、排行榜。
+4. ML 场景：分类、回归、时序、异常检测、推荐排序。
+5. LLM 场景：Prompt、RAG、Tool Use、安全评测、服务压测。
+6. 工程运维：消融、预算受限搜索、断点恢复、数据版本对比、复现性审计。
+
+文档中可直接复制代码：
+
+- [示例模板库导航](examples-lib/index.md)
+- [模板索引表](examples-lib/catalog.md)
+
 ## 常见坑
 
 1. 返回值不是 `dict | None`
 会被判定为失败，并写入 `error.log`。
 
 2. 仍按旧版 `_SUCCESS` 判断成功
-v0.3 不再使用 `_SUCCESS`，以 `run.json` 为准。
+v0.30 不再使用 `_SUCCESS`，以 `run.json` 为准。
 
 3. 直接把大文件写在 run 根目录
 建议统一放到 `artifacts/`，便于后续清理和归档。
@@ -119,6 +143,7 @@ v0.3 不再使用 `_SUCCESS`，以 `run.json` 为准。
 本地入口：
 
 - 生成脚本：[`scripts/gen_ref_pages.py`](https://github.com/ztxtech/ztxexp/blob/main/scripts/gen_ref_pages.py)
+- 模板文档：`examples-lib/`（由 `examples/template_library` 自动生成）
 - 构建产物：`docs/index.html` 与 `docs/reference/`（构建后生成）
 
 常用命令：

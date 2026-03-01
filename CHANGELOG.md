@@ -1,11 +1,22 @@
 # Changelog
 
-## 0.3.0 - 2026-03-02
+## 0.30.0 - 2026-03-02
 
 ### Changed
 
-- Bumped project version baseline from `0.2.0` to `0.3.0`.
+- Bumped project version baseline from `0.2.0` to `0.30.0`.
 - Updated package/runtime-facing version strings in metadata and examples.
+
+### Added
+
+- Added a copy-first template library under `examples/template_library` with 27 runnable templates.
+- Added scenario coverage across basics, parallel scheduling, analysis/cleanup, ML, LLM, and ops workflows.
+- Added automatic MkDocs template pages generation (`示例模板库`) from template source files.
+
+### Docs
+
+- README now highlights template-library-first workflow and direct copy paths.
+- Template index table is generated and available in docs navigation.
 
 ## 0.2.0 - 2026-03-01
 

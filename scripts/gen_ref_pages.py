@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import mkdocs_gen_files
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = ROOT / "ztxexp"
 PACKAGE_INIT = PACKAGE_DIR / "__init__.py"
 README_PATH = ROOT / "README.md"
+TEMPLATE_DIR = ROOT / "examples" / "template_library"
 
 nav = mkdocs_gen_files.Nav()
 
@@ -70,3 +72,84 @@ for source_path in sorted(PACKAGE_DIR.rglob("*.py")):
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
+
+
+def _extract_docstring(source_text: str) -> str:
+    """提取模块 docstring。
+
+    Args:
+        source_text: Python 源码文本。
+
+    Returns:
+        str: 提取到的 docstring；提取失败时返回空字符串。
+    """
+    try:
+        module_node = ast.parse(source_text)
+    except SyntaxError:
+        return ""
+    return ast.get_docstring(module_node) or ""
+
+
+def _write_template_library() -> None:
+    """生成示例模板库文档页面。"""
+    template_nav = mkdocs_gen_files.Nav()
+    docs_root = Path("examples-lib")
+
+    with mkdocs_gen_files.open(docs_root / "index.md", "w") as file_obj:
+        file_obj.write("# 示例模板库\n\n")
+        file_obj.write("该页面由 `examples/template_library` 目录自动生成。\n\n")
+        file_obj.write("复制策略：\n\n")
+        file_obj.write("1. 找到匹配场景模板；\n")
+        file_obj.write("2. 复制脚本并替换 `exp_fn` 内伪逻辑；\n")
+        file_obj.write("3. 直接运行并观察标准产物目录。\n")
+    template_nav[("场景总览",)] = "index.md"
+    mkdocs_gen_files.set_edit_path(docs_root / "index.md", README_PATH.relative_to(ROOT))
+
+    catalog_source = TEMPLATE_DIR / "README.md"
+    if catalog_source.exists():
+        with mkdocs_gen_files.open(docs_root / "catalog.md", "w") as file_obj:
+            file_obj.write(catalog_source.read_text(encoding="utf-8"))
+        template_nav[("模板索引表",)] = "catalog.md"
+        mkdocs_gen_files.set_edit_path(docs_root / "catalog.md", catalog_source.relative_to(ROOT))
+
+    if not TEMPLATE_DIR.exists():
+        with mkdocs_gen_files.open(docs_root / "SUMMARY.md", "w") as nav_file:
+            nav_file.writelines(template_nav.build_literate_nav())
+        return
+
+    for source_path in sorted(TEMPLATE_DIR.rglob("*.py")):
+        relative_source = source_path.relative_to(ROOT)
+        relative_template = source_path.relative_to(TEMPLATE_DIR).with_suffix("")
+        doc_path = (docs_root / Path(*relative_template.parts)).with_suffix(".md")
+        nav_parts = tuple(relative_template.parts)
+
+        source_text = source_path.read_text(encoding="utf-8")
+        module_doc = _extract_docstring(source_text)
+
+        with mkdocs_gen_files.open(doc_path, "w") as file_obj:
+            file_obj.write(f"# 模板：`{relative_template.as_posix()}`\n\n")
+            file_obj.write(f"源文件：`{relative_source.as_posix()}`\n\n")
+
+            if module_doc:
+                file_obj.write("## 场景说明\n\n")
+                file_obj.write(module_doc.strip() + "\n\n")
+
+            file_obj.write("## 一键复制起步\n\n")
+            file_obj.write("```bash\n")
+            file_obj.write(f"cp {relative_source.as_posix()} your_experiment.py\n")
+            file_obj.write("python your_experiment.py\n")
+            file_obj.write("```\n\n")
+
+            file_obj.write("## 模板代码\n\n")
+            file_obj.write("```python\n")
+            file_obj.write(source_text.rstrip() + "\n")
+            file_obj.write("```\n")
+
+        template_nav[nav_parts] = doc_path.relative_to(docs_root).as_posix()
+        mkdocs_gen_files.set_edit_path(doc_path, relative_source)
+
+    with mkdocs_gen_files.open(docs_root / "SUMMARY.md", "w") as nav_file:
+        nav_file.writelines(template_nav.build_literate_nav())
+
+
+_write_template_library()
