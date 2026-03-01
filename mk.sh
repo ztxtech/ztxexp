@@ -1,2 +1,2 @@
-mkdocs server
+mkdocs serve
 mkdocs build

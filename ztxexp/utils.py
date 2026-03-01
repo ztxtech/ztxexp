@@ -1,4 +1,10 @@
-"""General utilities for ztxexp."""
+"""通用工具函数集合。
+
+该模块被 manager/runner/analyzer 等核心组件复用，设计原则：
+1. 纯工具、低耦合；
+2. 尽量无全局副作用；
+3. 对可选依赖提供明确错误提示。
+"""
 
 from __future__ import annotations
 
@@ -19,6 +25,17 @@ import psutil
 
 
 def _json_default(value: Any) -> Any:
+    """JSON 序列化兜底转换器。
+
+    Args:
+        value: 需要序列化的对象。
+
+    Returns:
+        Any: 可被 ``json.dump`` 序列化的替代对象。
+
+    Raises:
+        TypeError: 无法转换为 JSON 兼容格式时抛出。
+    """
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, set):
@@ -31,6 +48,18 @@ def _json_default(value: Any) -> Any:
 
 
 def _require_dependency(module_name: str, extra_name: str):
+    """按需导入可选依赖。
+
+    Args:
+        module_name: 模块名，例如 ``torch``。
+        extra_name: 对应 pip extras 名称，例如 ``torch``。
+
+    Returns:
+        module: 导入后的模块对象。
+
+    Raises:
+        ImportError: 依赖缺失时抛出并附带安装提示。
+    """
     try:
         return __import__(module_name)
     except ImportError as exc:  # pragma: no cover
@@ -40,20 +69,38 @@ def _require_dependency(module_name: str, extra_name: str):
         ) from exc
 
 
-# --- Path & System Management ---
-
 def add_to_sys_path(path: str | Path) -> None:
-    """Adds a directory to the Python system path if it is not already there."""
+    """将目录加入 ``sys.path``（若尚未存在）。
+
+    Args:
+        path: 目标目录。
+
+    Returns:
+        None
+
+    Examples:
+        >>> add_to_sys_path("./")
+    """
     abs_path = str(Path(path).resolve())
     if abs_path not in sys.path:
         sys.path.insert(0, abs_path)
         print(f"Added '{abs_path}' to system path.")
 
 
-# --- Logging ---
-
 def setup_logger(name: str, log_file: str | Path, level: int = logging.INFO) -> logging.Logger:
-    """Sets up a logger that writes to both a file and the console."""
+    """创建或复用日志器（文件 + 控制台）。
+
+    Args:
+        name: logger 名称。
+        log_file: 文件日志路径。
+        level: 日志级别。
+
+    Returns:
+        logging.Logger: 配置完成的 logger。
+
+    Notes:
+        同名 logger 若已存在 handler，则直接复用，避免重复输出。
+    """
     log_path = Path(log_file)
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -77,10 +124,17 @@ def setup_logger(name: str, log_file: str | Path, level: int = logging.INFO) -> 
     return logger
 
 
-# --- Serialization ---
-
 def save_json(data: dict[str, Any], file_path: str | Path, indent: int = 2) -> None:
-    """Saves a dictionary to JSON."""
+    """保存字典为 JSON 文件。
+
+    Args:
+        data: 目标字典。
+        file_path: 输出路径。
+        indent: 缩进空格数。
+
+    Returns:
+        None
+    """
     path = Path(file_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as handle:
@@ -88,7 +142,16 @@ def save_json(data: dict[str, Any], file_path: str | Path, indent: int = 2) -> N
 
 
 def load_json(file_path: str | Path) -> dict[str, Any] | None:
-    """Loads JSON into dict. Returns None when file is missing."""
+    """读取 JSON 字典文件。
+
+    Args:
+        file_path: 文件路径。
+
+    Returns:
+        dict[str, Any] | None:
+            - 文件存在且顶层为 dict 时返回字典；
+            - 文件不存在或顶层非 dict 时返回 None。
+    """
     path = Path(file_path)
     if not path.exists():
         return None
@@ -100,21 +163,46 @@ def load_json(file_path: str | Path) -> dict[str, Any] | None:
 
 
 def save_dill(obj: object, file_path: str | Path) -> None:
-    """Serializes and saves an object using dill."""
+    """使用 dill 序列化对象到文件。
+
+    Args:
+        obj: 任意 Python 对象。
+        file_path: 输出路径。
+
+    Returns:
+        None
+    """
     dill = _require_dependency("dill", "core")
     with open(file_path, "wb") as handle:
         dill.dump(obj, handle)
 
 
 def load_dill(file_path: str | Path) -> object:
-    """Loads and deserializes an object using dill."""
+    """从 dill 文件反序列化对象。
+
+    Args:
+        file_path: 输入路径。
+
+    Returns:
+        object: 反序列化后的对象。
+    """
     dill = _require_dependency("dill", "core")
     with open(file_path, "rb") as handle:
         return dill.load(handle)
 
 
 def save_torch_model(model, optimizer, epoch: int, path: str | Path) -> None:
-    """Saves a torch model checkpoint."""
+    """保存 PyTorch checkpoint。
+
+    Args:
+        model: ``torch.nn.Module`` 实例。
+        optimizer: ``torch.optim.Optimizer`` 或 None。
+        epoch: 当前训练轮数。
+        path: 输出路径。
+
+    Returns:
+        None
+    """
     torch = _require_dependency("torch", "torch")
     torch.save(
         {
@@ -127,7 +215,16 @@ def save_torch_model(model, optimizer, epoch: int, path: str | Path) -> None:
 
 
 def load_torch_model(model, optimizer, path: str | Path):
-    """Loads a torch model checkpoint."""
+    """加载 PyTorch checkpoint。
+
+    Args:
+        model: ``torch.nn.Module`` 实例。
+        optimizer: ``torch.optim.Optimizer`` 或 None。
+        path: checkpoint 路径。
+
+    Returns:
+        tuple: ``(model, optimizer, epoch)``。
+    """
     torch = _require_dependency("torch", "torch")
     checkpoint = torch.load(path, map_location="cpu")
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -137,11 +234,21 @@ def load_torch_model(model, optimizer, path: str | Path):
     return model, optimizer, epoch
 
 
-# --- Timing and Performance ---
-
 @contextmanager
 def timer(name: str, logger: logging.Logger | None = None):
-    """Times a code block and logs/prints elapsed seconds."""
+    """计时代码块。
+
+    Args:
+        name: 计时标签。
+        logger: 可选日志器。为空则打印到标准输出。
+
+    Yields:
+        None
+
+    Examples:
+        >>> with timer("step"):
+        ...     _ = sum(range(100))
+    """
     t0 = time.time()
     yield
     elapsed = time.time() - t0
@@ -153,7 +260,14 @@ def timer(name: str, logger: logging.Logger | None = None):
 
 
 def format_time_delta(seconds: float) -> str:
-    """Formats seconds into H/M/S."""
+    """将秒数格式化为 ``Hh Mm Ss``。
+
+    Args:
+        seconds: 总秒数。
+
+    Returns:
+        str: 例如 ``'1h 2m 3s'``。
+    """
     h = int(seconds // 3600)
     m = int((seconds % 3600) // 60)
     s = int(seconds % 60)
@@ -161,25 +275,45 @@ def format_time_delta(seconds: float) -> str:
 
 
 def get_memory_usage() -> str:
-    """Returns the memory usage of the current process in MB."""
+    """获取当前进程内存占用。
+
+    Returns:
+        str: 形如 ``'123.45 MB'``。
+    """
     process = psutil.Process(os.getpid())
     mem_info = process.memory_info()
     return f"{mem_info.rss / 1024 ** 2:.2f} MB"
 
 
-# --- Hashing and Reproducibility ---
-
 def config_to_hash(config: dict[str, Any], length: int = 8) -> str:
-    """Creates a deterministic hash from a configuration dictionary."""
+    """将配置字典映射为稳定短哈希。
+
+    Args:
+        config: 配置字典。
+        length: 截断长度。
+
+    Returns:
+        str: SHA256 前缀。
+
+    Examples:
+        >>> config_to_hash({"lr": 0.01}, length=6)
+        '...'
+    """
     sorted_config_str = json.dumps(config, sort_keys=True, default=_json_default)
     hash_object = hashlib.sha256(sorted_config_str.encode("utf-8"))
     return hash_object.hexdigest()[:length]
 
 
-# --- Display and Formatting ---
-
 def pretty_print_namespace(args, items_per_line: int = 3) -> None:
-    """Prints argparse.Namespace in a formatted and colorful way."""
+    """美观打印 Namespace。
+
+    Args:
+        args: ``argparse.Namespace``。
+        items_per_line: 每行展示的键值对数量。
+
+    Returns:
+        None
+    """
     args_dict = vars(args)
     if not args_dict:
         print("No arguments to print.")
@@ -188,7 +322,15 @@ def pretty_print_namespace(args, items_per_line: int = 3) -> None:
 
 
 def pretty_print_dict(d: dict[str, Any], items_per_line: int = 3) -> None:
-    """Prints a dictionary in a formatted and colorful way."""
+    """美观打印字典。
+
+    Args:
+        d: 目标字典。
+        items_per_line: 每行展示的键值对数量。
+
+    Returns:
+        None
+    """
     if not d:
         print("No items in dictionary to print.")
         return
@@ -207,15 +349,27 @@ def pretty_print_dict(d: dict[str, Any], items_per_line: int = 3) -> None:
         print(line)
 
 
-# --- Directory and File Operations ---
-
 def create_dir(path: str | Path) -> None:
-    """Creates a directory if it does not exist."""
+    """递归创建目录（已存在则忽略）。
+
+    Args:
+        path: 目录路径。
+
+    Returns:
+        None
+    """
     os.makedirs(path, exist_ok=True)
 
 
 def delete_dir(path: str | Path) -> None:
-    """Deletes a directory and all its contents."""
+    """删除目录及其全部内容。
+
+    Args:
+        path: 目标目录路径。
+
+    Returns:
+        None
+    """
     target = Path(path)
     if target.exists() and target.is_dir():
         shutil.rmtree(target)
@@ -223,7 +377,14 @@ def delete_dir(path: str | Path) -> None:
 
 
 def get_subdirectories(path: str | Path) -> list[pathlib.Path]:
-    """Returns all immediate subdirectories under path."""
+    """获取路径下的一级子目录列表。
+
+    Args:
+        path: 目标路径。
+
+    Returns:
+        list[pathlib.Path]: 一级子目录列表；不存在时返回空列表。
+    """
     p = pathlib.Path(path)
     if not p.exists() or not p.is_dir():
         return []
@@ -231,7 +392,14 @@ def get_subdirectories(path: str | Path) -> list[pathlib.Path]:
 
 
 def get_file_creation_time(file_path: str | Path) -> str:
-    """Gets formatted creation time for a file."""
+    """获取文件创建时间字符串。
+
+    Args:
+        file_path: 文件路径。
+
+    Returns:
+        str: 格式为 ``YYYY/MM/DD-HH:MM:SS``。
+    """
     path = pathlib.Path(file_path)
     timestamp = path.stat().st_ctime
     creation_time = datetime.fromtimestamp(timestamp)

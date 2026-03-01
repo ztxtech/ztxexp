@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=67", "wheel"]
+requires = ["setuptools>=67,<77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ authors = [
 description = "Experiment framework for ML/LLM workflows with reproducible run artifacts."
 readme = "README.md"
 requires-python = ">=3.9"
-license = "MIT"
+license = { text = "MIT" }
 keywords = [
     "experiment management",
     "deep learning",
@@ -21,6 +21,7 @@ keywords = [
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -74,6 +75,9 @@ Issues = "https://github.com/ztxtech/ztxexp/issues"
 where = ["."]
 include = ["ztxexp*"]
 exclude = ["tests*", "examples*", "docs*"]
+
+[tool.setuptools]
+license-files = []
 
 [tool.pytest.ini_options]
 addopts = "-q"

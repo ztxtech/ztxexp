@@ -1,7 +1,11 @@
 site_name: ztxexp
-site_description: Experiment framework for ML and LLM workflows
+site_description: API docs generated from source comments/docstrings
 repo_url: https://github.com/ztxtech/ztxexp
 repo_name: ztxtech/ztxexp
+
+docs_dir: docs_src
+site_dir: docs
+
 theme:
   name: material
   palette:
@@ -17,13 +21,6 @@ theme:
 
 nav:
   - Home: index.md
-  - Quickstart (ZH): quickstart.zh.md
-  - Concepts (ZH): concepts.zh.md
-  - Recipes (ZH): recipes.zh.md
-  - Migration v0.2 (ZH): migration-v02.zh.md
-  - English:
-      - Overview: overview.en.md
-      - Quickstart: quickstart.en.md
   - API Reference:
       - API Overview: api/index.md
       - Manager: api/manager.md
@@ -42,3 +39,10 @@ plugins:
           options:
             show_root_heading: true
             show_source: true
+            show_if_no_docstring: true
+            heading_level: 2
+            show_signature_annotations: true
+            docstring_style: google
+
+watch:
+  - ztxexp

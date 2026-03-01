@@ -418,3 +418,8 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,windows,python,jetbrains+all,pycharm
 /mkgenerate/
+
+# MkDocs source/output split:
+# - docs_src/: markdown source tracked in git
+# - docs/: rendered static site output (generated)
+/docs/

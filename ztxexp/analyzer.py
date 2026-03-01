@@ -1,4 +1,10 @@
-"""Result analysis and cleanup for ztxexp v0.2 artifact format."""
+"""结果分析与清理模块。
+
+本模块面向 v2 运行目录协议，提供：
+1. 记录聚合（to_records/to_dataframe）；
+2. 导出（to_csv/to_pivot_excel）；
+3. 清理（clean_results）。
+"""
 
 from __future__ import annotations
 
@@ -17,11 +23,23 @@ from ztxexp.constants import (
     RUN_STATUS_SUCCEEDED,
 )
 
+# 清理函数签名：输入单条扁平记录，返回是否删除。
 RecordPredicate = Callable[[dict[str, Any]], bool]
 
 
 class ResultAnalyzer:
-    """Reads and manages experiment artifacts in the v2 run directory format."""
+    """实验结果分析器（仅支持 schema v2）。
+
+    Args:
+        results_path: 运行根目录。
+
+    Raises:
+        FileNotFoundError: 结果目录不存在时抛出。
+
+    Examples:
+        >>> analyzer = ResultAnalyzer("./results_demo")
+        >>> df = analyzer.to_dataframe(statuses=("succeeded",))
+    """
 
     def __init__(self, results_path: str | Path):
         self.results_path = Path(results_path)
@@ -33,7 +51,22 @@ class ResultAnalyzer:
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
     ) -> list[dict[str, Any]]:
-        """Loads run records by merging config/run metadata/metrics."""
+        """读取 run 目录并合并为记录列表。
+
+        合并顺序：``config -> metrics -> run_meta``，后者覆盖前者同名键。
+
+        Args:
+            statuses: 允许状态集合；传 ``None`` 表示不过滤状态。
+            metrics_filename: 指标文件名，默认 ``metrics.json``。
+
+        Returns:
+            list[dict[str, Any]]: 扁平化记录列表。
+
+        Examples:
+            >>> records = ResultAnalyzer("./results_demo").to_records(statuses=None)
+            >>> isinstance(records, list)
+            True
+        """
         records: list[dict[str, Any]] = []
         target_statuses = set(statuses) if statuses is not None else None
 
@@ -55,7 +88,15 @@ class ResultAnalyzer:
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
     ) -> pd.DataFrame:
-        """Converts run records to DataFrame."""
+        """将记录列表转为 DataFrame。
+
+        Args:
+            statuses: 状态过滤条件。
+            metrics_filename: 指标文件名。
+
+        Returns:
+            pd.DataFrame: 聚合后的数据表；若无数据返回空 DataFrame。
+        """
         records = self.to_records(statuses=statuses, metrics_filename=metrics_filename)
         if not records:
             return pd.DataFrame()
@@ -68,7 +109,17 @@ class ResultAnalyzer:
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
     ) -> pd.DataFrame:
-        """Exports records to CSV and returns the DataFrame used for export."""
+        """导出 CSV，并返回导出所用 DataFrame。
+
+        Args:
+            output_path: CSV 输出路径。
+            sort_by: 排序字段列表（仅会使用存在于列中的字段）。
+            statuses: 状态过滤条件。
+            metrics_filename: 指标文件名。
+
+        Returns:
+            pd.DataFrame: 导出用 DataFrame（可能为空）。
+        """
         df = self.to_dataframe(statuses=statuses, metrics_filename=metrics_filename)
         if df.empty:
             print("No records found to export.")
@@ -93,7 +144,23 @@ class ResultAnalyzer:
         add_ranking: bool = True,
         ranking_ascending: bool = False,
     ) -> None:
-        """Creates and saves a pivot table from the input DataFrame."""
+        """生成透视表并导出 Excel。
+
+        Args:
+            output_path: Excel 输出路径。
+            df: 输入数据表。
+            index_cols: 透视表行索引字段。
+            column_cols: 透视表列索引字段。
+            value_cols: 值字段。
+            add_ranking: 是否附加名次标签（1st/2nd/3rd）。
+            ranking_ascending: 排名方向。``False`` 通常用于“值越大越好”。
+
+        Returns:
+            None
+
+        Notes:
+            该功能依赖 ``openpyxl``。未安装时会给出提示并安全返回。
+        """
         if df.empty:
             print("DataFrame is empty, cannot generate pivot table.")
             return
@@ -151,11 +218,27 @@ class ResultAnalyzer:
         metrics_filename: str = "metrics.json",
         confirm: bool = True,
     ) -> list[Path]:
-        """Deletes run folders that match status and/or custom predicate.
+        """清理匹配条件的 run 目录。
 
-        A run folder is marked for deletion when:
-        1) Its status is in `statuses` (if statuses is provided), or
-        2) `predicate(record)` returns True.
+        删除条件采用 OR 逻辑：
+        1) ``status in statuses``（当 statuses 非 None）；
+        2) ``predicate(record) is True``（当 predicate 非空）。
+
+        Args:
+            statuses: 状态过滤集合；``None`` 表示不按状态筛选。
+            predicate: 自定义删除规则。
+            dry_run: 为 ``True`` 时只打印并返回候选，不执行删除。
+            metrics_filename: 指标文件名。
+            confirm: 非 dry-run 且为 ``True`` 时，删除前二次确认。
+
+        Returns:
+            list[Path]:
+                - dry-run: 待删目录列表；
+                - 非 dry-run: 实际删除成功的目录列表。
+
+        Examples:
+            >>> analyzer = ResultAnalyzer("./results_demo")
+            >>> analyzer.clean_results(statuses=("failed",), dry_run=True)
         """
         target_statuses = set(statuses) if statuses is not None else None
         to_delete: list[Path] = []
@@ -204,6 +287,15 @@ class ResultAnalyzer:
         return deleted
 
     def _load_record(self, run_dir: Path, metrics_filename: str) -> dict[str, Any] | None:
+        """从单个 run 目录加载扁平记录。
+
+        Args:
+            run_dir: 单个 run 目录。
+            metrics_filename: 指标文件名。
+
+        Returns:
+            dict[str, Any] | None: 合并记录；若目录不符合 v2 协议则返回 None。
+        """
         run_meta = utils.load_json(run_dir / "run.json")
         if not run_meta:
             return None
@@ -218,7 +310,7 @@ class ResultAnalyzer:
         if not isinstance(metrics, dict):
             metrics = {}
 
-        record = {}
+        record: dict[str, Any] = {}
         record.update(config)
         record.update(metrics)
         record.update(run_meta)
