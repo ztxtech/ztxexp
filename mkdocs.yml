@@ -1,5 +1,5 @@
 site_name: ztxexp
-site_description: API docs generated from source comments/docstrings
+site_description: 从源码注释自动生成的中文 API 文档
 repo_url: https://github.com/ztxtech/ztxexp
 repo_name: ztxtech/ztxexp
 
@@ -20,19 +20,16 @@ theme:
     - search.highlight
 
 nav:
-  - Home: index.md
-  - API Reference:
-      - API Overview: api/index.md
-      - Manager: api/manager.md
-      - Runner: api/runner.md
-      - Analyzer: api/analyzer.md
-      - Pipeline: api/pipeline.md
-      - Types: api/types.md
-      - Environment: api/environment.md
-      - Utils: api/utils.md
+  - 首页: index.md
+  - API 参考: reference/
 
 plugins:
   - search
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
   - mkdocstrings:
       handlers:
         python:

@@ -1,0 +1,152 @@
+{
+  "workspaceFoldersFilePaths": [
+    "c:\\Users\\ztx\\Documents\\ztx-Doc\\Code\\github.com\\ztxexp/"
+  ],
+  "symbols": [],
+  "activeFileDiagnostics": [],
+  "debugConsoleOutput": "",
+  "terminalBuffer": "/ztx/miniconda3/Scripts/activate tsl\u001b>❯  source C:/Users/ztx/miniconda3/Scripts/activate tsl\r\n\r\n                                                                                \r\n%\r                                                                                \u001b=\r\n╭─░▒▓    ~/Doc/z/C/gith/ztxexp    main !7 ?1 \r\n╰─                                                                           ─╯ ",
+  "terminalSelection": "",
+  "terminalShellType": "Git Bash",
+  "repoContexts": [
+    {
+      "_repo": {
+        "rootUri": {
+          "$mid": 1,
+          "path": "/c:/Users/ztx/Documents/ztx-Doc/Code/github.com/ztxexp",
+          "scheme": "file"
+        },
+        "inputBox": {},
+        "kind": "repository",
+        "state": {},
+        "ui": {}
+      },
+      "rootUri": {
+        "$mid": 1,
+        "path": "/c:/Users/ztx/Documents/ztx-Doc/Code/github.com/ztxexp",
+        "scheme": "file"
+      },
+      "kind": "repository",
+      "headBranchName": "main",
+      "headCommitHash": "c946cc1014eeca069cc71127bdce7f50fcae5395",
+      "upstreamBranchName": "main",
+      "upstreamRemote": "origin",
+      "isRebasing": true,
+      "remotes": [
+        "origin"
+      ],
+      "remoteFetchUrls": [
+        "git@github.com:ztxtech/ztxexp.git"
+      ],
+      "worktrees": [
+        {
+          "name": "ztxexp",
+          "path": "c:\\Users\\ztx\\Documents\\ztx-Doc\\Code\\github.com\\ztxexp",
+          "ref": "refs/heads/main",
+          "detached": false,
+          "main": true
+        }
+      ],
+      "changes": {
+        "mergeChanges": [],
+        "indexChanges": [],
+        "workingTree": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "untrackedChanges": []
+      },
+      "_onDidChangeSignal": {
+        "_observers": {},
+        "debugName": "Observable Signal From Event"
+      },
+      "headBranchNameObs": {
+        "_observers": {},
+        "_debugNameData": {},
+        "_state": 0,
+        "_updateCount": 0,
+        "_dependencies": {},
+        "_dependenciesToBeRemoved": {},
+        "_isUpdating": false,
+        "_isComputing": false,
+        "_didReportChange": false,
+        "_isInBeforeUpdate": false,
+        "_isReaderValid": false,
+        "_removedObserverToCallEndUpdateOn": null
+      },
+      "headCommitHashObs": {
+        "_observers": {},
+        "_debugNameData": {},
+        "_state": 0,
+        "_updateCount": 0,
+        "_dependencies": {},
+        "_dependenciesToBeRemoved": {},
+        "_isUpdating": false,
+        "_isComputing": false,
+        "_didReportChange": false,
+        "_isInBeforeUpdate": false,
+        "_isReaderValid": false,
+        "_removedObserverToCallEndUpdateOn": null
+      },
+      "upstreamBranchNameObs": {
+        "_observers": {},
+        "_debugNameData": {},
+        "_state": 0,
+        "_updateCount": 0,
+        "_dependencies": {},
+        "_dependenciesToBeRemoved": {},
+        "_isUpdating": false,
+        "_isComputing": false,
+        "_didReportChange": false,
+        "_isInBeforeUpdate": false,
+        "_isReaderValid": false,
+        "_removedObserverToCallEndUpdateOn": null
+      },
+      "upstreamRemoteObs": {
+        "_observers": {},
+        "_debugNameData": {},
+        "_state": 0,
+        "_updateCount": 0,
+        "_dependencies": {},
+        "_dependenciesToBeRemoved": {},
+        "_isUpdating": false,
+        "_isComputing": false,
+        "_didReportChange": false,
+        "_isInBeforeUpdate": false,
+        "_isReaderValid": false,
+        "_removedObserverToCallEndUpdateOn": null
+      },
+      "isRebasingObs": {
+        "_observers": {},
+        "_debugNameData": {},
+        "_state": 0,
+        "_updateCount": 0,
+        "_dependencies": {},
+        "_dependenciesToBeRemoved": {},
+        "_isUpdating": false,
+        "_isComputing": false,
+        "_didReportChange": false,
+        "_isInBeforeUpdate": false,
+        "_isReaderValid": false,
+        "_removedObserverToCallEndUpdateOn": null
+      },
+      "_checkIsIgnored": {
+        "_waitingTimeMs": 1000,
+        "_queue": [],
+        "_timeout": null
+      },
+      "_isIgnored": {
+        "_map": {},
+        "_map2": {}
+      }
+    }
+  ],
+  "notebookDocumentFilePaths": [],
+  "textDocumentFilePaths": []
+}

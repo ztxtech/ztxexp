@@ -19,7 +19,7 @@ import time
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 import psutil
 
@@ -47,7 +47,7 @@ def _json_default(value: Any) -> Any:
     raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
 
 
-def _require_dependency(module_name: str, extra_name: str):
+def _require_dependency(module_name: str, extra_name: str) -> Any:
     """按需导入可选依赖。
 
     Args:
@@ -191,7 +191,7 @@ def load_dill(file_path: str | Path) -> object:
         return dill.load(handle)
 
 
-def save_torch_model(model, optimizer, epoch: int, path: str | Path) -> None:
+def save_torch_model(model: Any, optimizer: Any | None, epoch: int, path: str | Path) -> None:
     """保存 PyTorch checkpoint。
 
     Args:
@@ -214,7 +214,11 @@ def save_torch_model(model, optimizer, epoch: int, path: str | Path) -> None:
     )
 
 
-def load_torch_model(model, optimizer, path: str | Path):
+def load_torch_model(
+    model: Any,
+    optimizer: Any | None,
+    path: str | Path,
+) -> tuple[Any, Any | None, int]:
     """加载 PyTorch checkpoint。
 
     Args:
@@ -235,7 +239,7 @@ def load_torch_model(model, optimizer, path: str | Path):
 
 
 @contextmanager
-def timer(name: str, logger: logging.Logger | None = None):
+def timer(name: str, logger: logging.Logger | None = None) -> Iterator[None]:
     """计时代码块。
 
     Args:
@@ -304,7 +308,7 @@ def config_to_hash(config: dict[str, Any], length: int = 8) -> str:
     return hash_object.hexdigest()[:length]
 
 
-def pretty_print_namespace(args, items_per_line: int = 3) -> None:
+def pretty_print_namespace(args: Any, items_per_line: int = 3) -> None:
     """美观打印 Namespace。
 
     Args:

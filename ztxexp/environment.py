@@ -9,12 +9,13 @@ from __future__ import annotations
 
 import os
 import random
+from typing import Any
 
 import numpy as np
 import psutil
 
 
-def _require_torch():
+def _require_torch() -> Any:
     """按需导入 torch。
 
     Returns:
@@ -39,7 +40,7 @@ def init_torch_env(
     gpu_id: int = 0,
     deterministic: bool = False,
     benchmark: bool = False,
-):
+) -> Any:
     """初始化 PyTorch 实验环境。
 
     Args:

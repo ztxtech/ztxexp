@@ -110,11 +110,25 @@ v0.2 不再使用 `_SUCCESS`，以 `run.json` 为准。
 
 ## API 导航
 
-- 中文文档入口: [docs/index.md](docs/index.md)
-- 快速开始: [docs/quickstart.zh.md](docs/quickstart.zh.md)
-- 迁移说明: [docs/migration-v02.zh.md](docs/migration-v02.zh.md)
-- English overview: [docs/overview.en.md](docs/overview.en.md)
-- API 参考: [docs/api/index.md](docs/api/index.md)
+文档采用“源码注释驱动”模式，不再手工维护 API Markdown：
+
+1. `mkdocs build` 时自动扫描 `ztxexp/*.py`；
+2. 自动生成首页 `index.md` 与 `reference/` API 页面；
+3. `mkdocstrings` 从类/函数 docstring 渲染参数、返回值与示例。
+
+本地入口：
+
+- 生成脚本：[`scripts/gen_ref_pages.py`](scripts/gen_ref_pages.py)
+- 构建产物：`docs/index.html` 与 `docs/reference/`（构建后生成）
+
+常用命令：
+
+```bash
+pip install -e ".[docs]"
+NO_MKDOCS_2_WARNING=1 mkdocs build --strict
+NO_MKDOCS_2_WARNING=1 mkdocs serve
+# 或使用脚本：sh mk.sh build / sh mk.sh serve
+```
 
 ## 贡献
 

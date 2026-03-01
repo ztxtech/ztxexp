@@ -48,6 +48,8 @@ torch = [
 docs = [
     "mkdocs>=1.6",
     "mkdocs-material>=9.5",
+    "mkdocs-gen-files>=0.5",
+    "mkdocs-literate-nav>=0.6",
     "mkdocstrings[python]>=0.26",
     "pyyaml>=6.0",
 ]
@@ -62,13 +64,15 @@ dev = [
     "openpyxl>=3.1",
     "mkdocs>=1.6",
     "mkdocs-material>=9.5",
+    "mkdocs-gen-files>=0.5",
+    "mkdocs-literate-nav>=0.6",
     "mkdocstrings[python]>=0.26",
 ]
 
 [project.urls]
-Homepage = "https://ztxtech.github.io/ztxexp/"
+Homepage = "https://github.com/ztxtech/ztxexp"
 Repository = "https://github.com/ztxtech/ztxexp"
-Documentation = "https://ztxtech.github.io/ztxexp/"
+Documentation = "https://ztxexp.readthedocs.io/en/latest/"
 Issues = "https://github.com/ztxtech/ztxexp/issues"
 
 [tool.setuptools.packages.find]

@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-set -eu
+#!/usr/bash
 
 # Ensure stale artifacts from previous failed builds don't get uploaded.
 rm -rf build dist *.egg-info
