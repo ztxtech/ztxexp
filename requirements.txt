@@ -1,8 +1,1 @@
-dill
-joblib
-numpy
-pandas
-psutil
-torch
-twine
-build
+-e .[dev,torch]

@@ -1,37 +1,28 @@
-import torch
+from __future__ import annotations
 
 from ztxexp import utils
 
-print("=" * 20 + " Demonstrating Standalone Utils " + "=" * 20)
+print("=" * 20 + " Standalone Utils Demo " + "=" * 20)
 
-# --- 1. 日志设置 ---
-logger = utils.setup_logger('my_util_test', './my_test.log')
-logger.info("Logger setup complete.")
+logger = utils.setup_logger("utils_demo", "./utils_demo.log")
+logger.info("Logger is ready.")
 
-# --- 2. 计时器 ---
-with utils.timer("Data Processing", logger=logger):
-    # 模拟耗时操作
-    data = [i * i for i in range(10_000_000)]
-    logger.info("Data processing finished.")
+with utils.timer("processing", logger=logger):
+    _ = [i * i for i in range(200000)]
 
-# --- 3. 配置哈希 ---
-my_config = {'lr': 0.01, 'model': 'ResNet', 'layers': [3, 4, 6, 3]}
-config_hash = utils.config_to_hash(my_config, length=10)
-logger.info(f"Config hash is: {config_hash}")
+cfg = {"lr": 0.01, "model": "tiny", "layers": [2, 2, 6, 2]}
+print("hash:", utils.config_to_hash(cfg, length=10))
+utils.pretty_print_dict(cfg)
+print("memory:", utils.get_memory_usage())
 
-# --- 4. 打印与内存监控 ---
-print("\n--- Pretty Printing Config ---")
-utils.pretty_print_dict(my_config)
-logger.info(f"Current memory usage: {utils.get_memory_usage()}")
+try:
+    import torch
 
-# --- 5. PyTorch模型保存/加载 (示例) ---
-model = torch.nn.Linear(10, 2)
-optimizer = torch.optim.Adam(model.parameters())
-model_path = './my_model.pth'
-
-print("\n--- Saving and Loading PyTorch Model ---")
-utils.save_torch_model(model, optimizer, epoch=10, path=model_path)
-logger.info(f"Model saved to {model_path}")
-
-model, optimizer, epoch = utils.load_torch_model(model, optimizer, path=model_path)
-logger.info(f"Model loaded. Current epoch is {epoch}")
+    model = torch.nn.Linear(10, 2)
+    optimizer = torch.optim.Adam(model.parameters())
+    ckpt = "./demo_model.pth"
+    utils.save_torch_model(model, optimizer, epoch=1, path=ckpt)
+    model, optimizer, epoch = utils.load_torch_model(model, optimizer, path=ckpt)
+    print("torch checkpoint loaded, epoch=", epoch)
+except ImportError:
+    print("torch is not installed; skip torch checkpoint demo.")

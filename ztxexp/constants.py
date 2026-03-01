@@ -1,0 +1,15 @@
+"""Shared constants for ztxexp runtime artifacts."""
+
+RUN_SCHEMA_VERSION = 2
+
+RUN_STATUS_RUNNING = "running"
+RUN_STATUS_SUCCEEDED = "succeeded"
+RUN_STATUS_FAILED = "failed"
+RUN_STATUS_SKIPPED = "skipped"
+
+VALID_RUN_STATUSES = {
+    RUN_STATUS_RUNNING,
+    RUN_STATUS_SUCCEEDED,
+    RUN_STATUS_FAILED,
+    RUN_STATUS_SKIPPED,
+}

@@ -1,190 +1,226 @@
-"""
-Experiment Result Analyzer
-==========================
+"""Result analysis and cleanup for ztxexp v0.2 artifact format."""
 
-This module provides tools for analyzing experiment results, including
-aggregating results into DataFrames, saving to CSV/Excel files, and 
-cleaning up result directories.
+from __future__ import annotations
 
-Classes:
-    ResultAnalyzer: Main class for analyzing experiment results.
-"""
 import shutil
 from pathlib import Path
+from typing import Any, Callable, Sequence
 
 import pandas as pd
 
 from ztxexp import utils
-from ztxexp.runner import SUCCESS_MARKER  # Import the constant
+from ztxexp.constants import (
+    RUN_SCHEMA_VERSION,
+    RUN_STATUS_FAILED,
+    RUN_STATUS_RUNNING,
+    RUN_STATUS_SKIPPED,
+    RUN_STATUS_SUCCEEDED,
+)
+
+RecordPredicate = Callable[[dict[str, Any]], bool]
 
 
 class ResultAnalyzer:
-    def __init__(self, results_path: str):
+    """Reads and manages experiment artifacts in the v2 run directory format."""
+
+    def __init__(self, results_path: str | Path):
         self.results_path = Path(results_path)
         if not self.results_path.exists():
             raise FileNotFoundError(f"Results path does not exist: {self.results_path}")
 
-    def to_dataframe(self, results_filename: str = 'results.json') -> pd.DataFrame:
-        """
-        Aggregates results into a pandas DataFrame.
-        It now only considers folders with a _SUCCESS marker and merges
-        'args.json' with a specified results file.
+    def to_records(
+        self,
+        statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
+        metrics_filename: str = "metrics.json",
+    ) -> list[dict[str, Any]]:
+        """Loads run records by merging config/run metadata/metrics."""
+        records: list[dict[str, Any]] = []
+        target_statuses = set(statuses) if statuses is not None else None
 
-        Args:
-            results_filename (str): The name of the file containing experiment
-                                    metrics (e.g., 'results.json').
-        """
-        folders = utils.get_subdirectories(str(self.results_path))
-        records = []
-
-        print(f"Analyzing results... Looking for '{SUCCESS_MARKER}' and '{results_filename}'.")
-
-        for folder in folders:
-            # ONLY consider folders that have the success marker
-            if not (folder / SUCCESS_MARKER).exists():
+        for run_dir in utils.get_subdirectories(self.results_path):
+            record = self._load_record(run_dir, metrics_filename)
+            if record is None:
                 continue
 
-            args_path = folder / 'args.json'
-            if args_path.exists():
-                record = utils.load_json(str(args_path))
-                if not record:
-                    continue
+            status = record.get("status")
+            if target_statuses is not None and status not in target_statuses:
+                continue
 
-                # Load results file and merge it into the record
-                results_path = folder / results_filename
-                if results_path.exists():
-                    results_data = utils.load_json(str(results_path))
-                    if results_data:
-                        record.update(results_data)
+            records.append(record)
 
-                record['setting_path'] = str(folder.resolve())
-                record['creation_time'] = utils.get_file_creation_time(args_path)
-                records.append(record)
+        return records
 
+    def to_dataframe(
+        self,
+        statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
+        metrics_filename: str = "metrics.json",
+    ) -> pd.DataFrame:
+        """Converts run records to DataFrame."""
+        records = self.to_records(statuses=statuses, metrics_filename=metrics_filename)
         if not records:
-            print("No successfully completed experiments found.")
             return pd.DataFrame()
-
         return pd.DataFrame.from_records(records)
 
-    def to_csv(self, output_path: str, sort_by: list[str] = None):
-        """Saves the aggregated results to a CSV file."""
-
-        df = self.to_dataframe()
+    def to_csv(
+        self,
+        output_path: str | Path,
+        sort_by: Sequence[str] | None = None,
+        statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
+        metrics_filename: str = "metrics.json",
+    ) -> pd.DataFrame:
+        """Exports records to CSV and returns the DataFrame used for export."""
+        df = self.to_dataframe(statuses=statuses, metrics_filename=metrics_filename)
         if df.empty:
-            print("No results found to generate CSV.")
-            return
+            print("No records found to export.")
+            return df
 
         if sort_by:
-            valid_sort_keys = [key for key in sort_by if key in df.columns]
-            if valid_sort_keys:
-                df = df.sort_values(by=valid_sort_keys).reset_index(drop=True)
+            valid_keys = [key for key in sort_by if key in df.columns]
+            if valid_keys:
+                df = df.sort_values(by=valid_keys).reset_index(drop=True)
 
         df.to_csv(output_path, index=False)
-        print(f"Results saved to {output_path}")
+        print(f"Saved CSV to {output_path}")
+        return df
 
-    def to_pivot_excel(self, output_path: str, df: pd.DataFrame, index_cols: list[str], column_cols: list[str],
-                       value_cols: list[str], add_ranking: bool = True):
-        """Creates a pivot table from the results and saves it to an Excel file."""
-
+    def to_pivot_excel(
+        self,
+        output_path: str | Path,
+        df: pd.DataFrame,
+        index_cols: Sequence[str],
+        column_cols: Sequence[str],
+        value_cols: Sequence[str],
+        add_ranking: bool = True,
+        ranking_ascending: bool = False,
+    ) -> None:
+        """Creates and saves a pivot table from the input DataFrame."""
         if df.empty:
             print("DataFrame is empty, cannot generate pivot table.")
             return
 
         try:
-            pivot_df = df.pivot_table(
-                index=index_cols,
-                columns=column_cols,
-                values=value_cols
-            )
-        except Exception as e:
-            print(f"Could not create pivot table. Error: {e}")
+            pivot_df = df.pivot_table(index=index_cols, columns=column_cols, values=value_cols)
+        except Exception as exc:
+            print(f"Failed to create pivot table: {exc}")
             return
 
         if not add_ranking:
-            pivot_df.to_excel(output_path)
-            print(f"Pivot table saved to {output_path}")
+            try:
+                pivot_df.to_excel(output_path)
+            except ImportError:
+                print(
+                    "openpyxl is required for Excel export. "
+                    "Install with: pip install openpyxl"
+                )
+                return
+            print(f"Saved pivot table to {output_path}")
             return
 
-        rank_df = pivot_df.rank(method='min', ascending=True)
+        rank_df = pivot_df.rank(method="min", ascending=ranking_ascending)
         final_pivot = pivot_df.astype(str)
-        rank_labels = {1: ' (1st)', 2: ' (2nd)', 3: ' (3rd)'}
+        rank_labels = {1.0: " (1st)", 2.0: " (2nd)", 3.0: " (3rd)"}
 
         for col in final_pivot.columns:
             for idx in final_pivot.index:
                 value = pivot_df.at[idx, col]
                 if pd.notna(value):
                     rank = rank_df.at[idx, col]
-                    rank_label = rank_labels.get(rank, '')
-                    final_pivot.at[idx, col] = f"{value:.4f}{rank_label}"
+                    final_pivot.at[idx, col] = f"{value:.4f}{rank_labels.get(rank, '')}"
                 else:
                     final_pivot.at[idx, col] = ""
 
-        final_pivot.to_excel(output_path)
-        print(f"Pivot table with ranking saved to {output_path}")
-
-    def clean_results(self,
-                      incomplete_marker: str = SUCCESS_MARKER,  # Default to the reliable marker
-                      filter_func: callable = None,
-                      dry_run: bool = True):
-        """
-        Deletes result folders based on specified criteria.
-
-        Args:
-            incomplete_marker (str, optional): A filename (e.g., 'metrics.npy' or 'final.pth')
-                that marks an experiment as complete. Folders missing this file will be
-                targeted for deletion.
-            filter_func (callable, optional): A function that takes a configuration
-                dictionary (from args.json) and returns True if the folder should be deleted.
-            dry_run (bool): If True, only prints which folders would be deleted without
-                actually deleting them. Set to False to perform deletion.
-        """
-        folders_to_delete = set()
-        all_folders = utils.get_subdirectories(str(self.results_path))
-
-        # 1. Identify folders based on criteria
-        for folder in all_folders:
-            # Criterion 1: Check for incomplete runs
-            if incomplete_marker and not (folder / incomplete_marker).exists():
-                folders_to_delete.add(folder)
-                print(f"[INCOMPLETE] Marked for deletion: {folder.name} (missing '{incomplete_marker}')")
-                continue  # Move to next folder once marked
-
-            # Criterion 2: Apply custom filter function
-            if filter_func:
-                args_path = folder / 'args.json'
-                if args_path.exists():
-                    config = utils.load_json(str(args_path))
-                    if config and filter_func(config):
-                        folders_to_delete.add(folder)
-                        print(f"[FILTER MATCH] Marked for deletion: {folder.name}")
-
-        if not folders_to_delete:
-            print("No folders matched the cleaning criteria.")
+        try:
+            final_pivot.to_excel(output_path)
+        except ImportError:
+            print(
+                "openpyxl is required for Excel export. "
+                "Install with: pip install openpyxl"
+            )
             return
+        print(f"Saved ranked pivot table to {output_path}")
 
-        print("\n" + "=" * 50)
-        print(f"Found {len(folders_to_delete)} folders to delete.")
-        print("=" * 50)
+    def clean_results(
+        self,
+        statuses: Sequence[str] | None = (
+            RUN_STATUS_FAILED,
+            RUN_STATUS_RUNNING,
+            RUN_STATUS_SKIPPED,
+        ),
+        predicate: RecordPredicate | None = None,
+        dry_run: bool = True,
+        metrics_filename: str = "metrics.json",
+        confirm: bool = True,
+    ) -> list[Path]:
+        """Deletes run folders that match status and/or custom predicate.
 
-        # 2. Perform deletion (or simulate if dry_run)
+        A run folder is marked for deletion when:
+        1) Its status is in `statuses` (if statuses is provided), or
+        2) `predicate(record)` returns True.
+        """
+        target_statuses = set(statuses) if statuses is not None else None
+        to_delete: list[Path] = []
+
+        for run_dir in utils.get_subdirectories(self.results_path):
+            record = self._load_record(run_dir, metrics_filename)
+            if record is None:
+                continue
+
+            should_delete = False
+            if target_statuses is not None and record.get("status") in target_statuses:
+                should_delete = True
+            if predicate and predicate(record):
+                should_delete = True
+
+            if should_delete:
+                to_delete.append(run_dir)
+
+        if not to_delete:
+            print("No folders matched cleanup criteria.")
+            return []
+
+        print(f"Found {len(to_delete)} folders to delete.")
+        for run_dir in to_delete:
+            print(f"  - {run_dir.name}")
+
         if dry_run:
-            print("\n[DRY RUN] The following folders would be deleted:")
-            for folder in sorted(list(folders_to_delete)):
-                print(f"  - {folder.name}")
-            print("\nTo delete these folders, run this method with `dry_run=False`.")
-        else:
-            # Confirmation step for safety
-            confirm = input(
-                f"Are you sure you want to permanently delete these {len(folders_to_delete)} folders? (yes/no): ")
-            if confirm.lower() == 'yes':
-                print("Deleting folders...")
-                for folder in folders_to_delete:
-                    try:
-                        shutil.rmtree(folder)
-                        print(f"  - Deleted: {folder.name}")
-                    except Exception as e:
-                        print(f"  - Error deleting {folder.name}: {e}")
-                print("Cleaning complete.")
-            else:
-                print("Deletion cancelled by user.")
+            print("Dry run enabled. Nothing was deleted.")
+            return to_delete
+
+        if confirm:
+            answer = input(f"Delete these {len(to_delete)} folders permanently? (yes/no): ")
+            if answer.strip().lower() != "yes":
+                print("Deletion canceled.")
+                return []
+
+        deleted: list[Path] = []
+        for run_dir in to_delete:
+            try:
+                shutil.rmtree(run_dir)
+                deleted.append(run_dir)
+            except Exception as exc:  # pragma: no cover
+                print(f"Failed to delete {run_dir}: {exc}")
+
+        print(f"Deleted {len(deleted)} folders.")
+        return deleted
+
+    def _load_record(self, run_dir: Path, metrics_filename: str) -> dict[str, Any] | None:
+        run_meta = utils.load_json(run_dir / "run.json")
+        if not run_meta:
+            return None
+        if run_meta.get("schema_version") != RUN_SCHEMA_VERSION:
+            return None
+
+        config = utils.load_json(run_dir / "config.json") or {}
+        if not isinstance(config, dict):
+            return None
+
+        metrics = utils.load_json(run_dir / metrics_filename) or {}
+        if not isinstance(metrics, dict):
+            metrics = {}
+
+        record = {}
+        record.update(config)
+        record.update(metrics)
+        record.update(run_meta)
+        record["run_dir"] = str(run_dir.resolve())
+        return record

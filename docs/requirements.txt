@@ -1,4 +1,1 @@
-mkdocs
-mkdocs-material
-mkdocstrings[python]
-pyyaml
+-e ..[docs]
