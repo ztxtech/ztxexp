@@ -428,3 +428,6 @@ $RECYCLE.BIN/
 /AGENTS.md
 /codex-trace.md
 /.codex/
+
+# VS Code local workspace settings (do not commit)
+/.vscode/
