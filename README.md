@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 13:26:55 (Asia/Shanghai): 持久化 MkDocs 主题基线：固定 `material + default(indigo/indigo)`，禁用颜色切换按钮；并规范化 `mkdocs.yml` 结构，去除冗余 `theme.theme` 嵌套字段以避免后续维护歧义。
 - 2026-03-02 13:09:24 (Asia/Shanghai): 按初始方案回退 MkDocs Material 主题配置：固定单一配色 `blue grey + teal`，移除颜色切换按钮与额外主题覆盖样式；同时修复 GitHub Actions 打包步骤，`python -m build --no-isolation` 改为 `python -m build`，避免 `setuptools.build_meta` 不可用错误。
 - 2026-03-02 12:55:48 (Asia/Shanghai): 调整 MkDocs Material 视觉为“logo 同系淡紫主题”，主导航栏与链接色改为紫蓝渐变对应色，并移除过度装饰的内容背景，整体回归官方 Material 的简洁版式。
 - 2026-03-02 12:40:33 (Asia/Shanghai): 接入项目 logo：README 顶部新增品牌图，MkDocs Material 主题新增 `logo/favicon` 配置，并将图片同步到 `docs_src/etc/images/`，保证文档站点与仓库页面均可正常显示。
