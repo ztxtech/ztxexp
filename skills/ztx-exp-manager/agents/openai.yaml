@@ -1,0 +1,5 @@
+display_name: ztx-exp-manager
+short_description: Build and govern ML/LLM experiment workflows with ztxexp.
+default_prompt: >-
+  Use ExperimentPipeline and RunContext to build reproducible experiments,
+  enforce run artifact protocol, and analyze failures by run status and logs.

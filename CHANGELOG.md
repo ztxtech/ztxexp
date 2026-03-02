@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.0.2 - 2026-03-02
+
+### Breaking
+
+- None.
+
+### Added
+
+- Added first-party skills integration for agent ecosystems:
+  - repository built-in skill directory: `skills/ztx-exp-manager/`
+  - built-in skill files: `SKILL.md` + `agents/openai.yaml`
+- Added CLI subcommands for skill lifecycle management:
+  - `ztxexp init-skill`
+  - `ztxexp show-skill`
+  - `ztxexp remove-skill`
+- Added interactive target selection for `init-skill` when `--target` is omitted:
+  - `1` -> `skills/`
+  - `2` -> `.codex/skills/`
+  - `3` -> both
+- Added managed marker protocol for safe skill updates/removals:
+  - `.ztxexp-managed-skill.json`
+  - default remove policy only deletes managed installs
+- Added automated CLI and behavior tests for skill workflows:
+  - `tests/test_cli_skill.py`
+
+### Fixed
+
+- Improved safety for skill deletion by skipping unmanaged directories unless `--force` is used.
+- Improved non-interactive behavior by defaulting `init-skill` to `skills/` when prompt is disabled.
+
+### Docs
+
+- Added README sections for `init-skill/show-skill/remove-skill` usage and options.
+
+### Migration
+
+- Upgrade directly from `1.0.1`:
+  - `pip install -U ztxexp`
+- Initialize built-in skill in any target project:
+  - `ztxexp init-skill`
+
 ## 1.0.1 - 2026-03-02
 
 ### Breaking

@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 16:15:33 (Asia/Shanghai): 发布 `v1.0.2` skills 生态支持，新增 `ztxexp init-skill/show-skill/remove-skill`，可将内置 `ztx-exp-manager` skill 注入到用户项目；`init-skill` 在未指定 `--target` 时支持交互选择写入 `skills/`、`.codex/skills/` 或两处同时写入，并提供受管标记与安全删除策略。
 - 2026-03-02 15:28:11 (Asia/Shanghai): 发布 `v1.0.1` CLI 能力，新增 `ztxexp init-vibe/show-vibe/remove-vibe`，可在任意目标项目中持久化写入（或移除）Agent 使用区块，支持 `profile/language/project-root/agents-file/dry-run` 参数。
 - 2026-03-02 13:40:53 (Asia/Shanghai): 版本基线升级为 `1.0.0`，用于修复历史版本号（`0.30.0` 与 `0.4.0`）导致的升级顺序歧义，确保包管理器始终选择正确的最新版本。
 - 2026-03-02 12:22:22 (Asia/Shanghai): 完成 `v0.4.0` 发布级收口，新增 CI 工作流（`ruff + pytest + mkdocs --strict + build + twine check`）与模板 smoke tests；同时修正依赖分层，`mlflow/wandb` 保持为可选 extras，不再随 `dev` 默认安装。
@@ -92,6 +93,35 @@ ztxexp init-vibe --dry-run
 ztxexp remove-vibe --project-root /path/to/your-project
 ```
 
+### CLI：Skills 注入与管理（v1.0.2）
+
+```bash
+# 交互式初始化（未指定 --target 时会提示 1/2/3）
+ztxexp init-skill
+
+# 非交互模式：默认写入 skills/
+ztxexp init-skill --no-interactive
+
+# 显式指定写入目标
+ztxexp init-skill --target skills
+ztxexp init-skill --target codex
+ztxexp init-skill --target both
+
+# 预览内置 skill 内容
+ztxexp show-skill --language bilingual
+
+# 预览并附带 agents/openai.yaml
+ztxexp show-skill --language zh --with-openai
+
+# 移除受管安装（默认检查 skills + .codex/skills）
+ztxexp remove-skill
+ztxexp remove-skill --target both
+
+# 仅预览，不落盘
+ztxexp init-skill --dry-run
+ztxexp remove-skill --dry-run
+```
+
 参数说明（`init-vibe` / `remove-vibe`）：
 
 - `--project-root PATH`：目标项目目录，默认当前工作目录。
@@ -102,6 +132,22 @@ ztxexp remove-vibe --project-root /path/to/your-project
 
 - `--profile {webcoding,codex,cursor,cline,copilot}`：默认 `webcoding`。
 - `--language {bilingual,zh,en}`：默认 `bilingual`。
+
+参数说明（`init-skill`）：
+
+- `--project-root PATH`：目标项目目录，默认当前工作目录。
+- `--target {skills,codex,both}`：skill 写入目标；不传时进入 1/2/3 交互选择。
+- `--language {bilingual,zh,en}`：生成的 `SKILL.md` 语言，默认 `bilingual`。
+- `--dry-run`：仅预览变更，不写文件。
+- `--no-interactive`：禁用交互，默认回退到 `skills/`。
+- `--force`：允许覆盖未受管目录（谨慎使用）。
+
+参数说明（`remove-skill`）：
+
+- `--project-root PATH`：目标项目目录，默认当前工作目录。
+- `--target {skills,codex,both}`：删除范围；不传时默认 `both`。
+- `--dry-run`：仅预览将删除的目标。
+- `--force`：允许删除未受管目录（默认仅删除受管安装）。
 
 受管区块标记：
 

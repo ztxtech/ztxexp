@@ -147,5 +147,5 @@ def test_version_bump_consistency():
     repo_root = Path(__file__).resolve().parents[1]
     pyproject_path = repo_root / "pyproject.toml"
     parsed = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
-    assert parsed["project"]["version"] == "1.0.1"
-    assert ztxexp.__version__ == "1.0.1"
+    assert parsed["project"]["version"] == "1.0.2"
+    assert ztxexp.__version__ == "1.0.2"
