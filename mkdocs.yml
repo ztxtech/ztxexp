@@ -29,7 +29,7 @@ theme:
 nav:
   - 首页: index.md
   - 用户手册: user-manual.zh.md
-  - 迁移指南: migration-v04.zh.md
+  - Vibe Coding: vibe-coding.zh.md
   - 示例模板库: examples-lib/
   - API 参考: reference/
 

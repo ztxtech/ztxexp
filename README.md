@@ -238,6 +238,7 @@ analyzer.to_csv("./results_demo/summary.csv", sort_by=["model", "lr"])
 推荐先看用户手册，再查 API：
 
 - [用户手册（开发流程与产物协议）](user-manual.zh.md)
+- [Vibe Coding 指南（Agent 场景配置）](vibe-coding.zh.md)
 - [API 参考（函数与类型签名）](reference/)
 
 本地入口：
