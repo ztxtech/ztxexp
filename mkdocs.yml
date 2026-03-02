@@ -12,10 +12,15 @@ theme:
   language: zh
   logo: etc/images/logo.png
   favicon: etc/images/favicon.png
-  palette:
-    scheme: default
-    primary: blue grey
-    accent: teal
+  theme:
+    name: material
+    palette:
+      scheme: default
+      primary: indigo
+      accent: indigo
+    font:
+      text: Roboto
+      code: Roboto Mono
   features:
     - navigation.tabs
     - navigation.sections
