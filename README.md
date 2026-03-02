@@ -189,6 +189,11 @@ analyzer.to_csv("./results_demo/summary.csv", sort_by=["model", "lr"])
 2. 自动生成首页 `index.md` 与 `reference/` API 页面；
 3. `mkdocstrings` 从类/函数 docstring 渲染参数、返回值与示例。
 
+推荐先看用户手册，再查 API：
+
+- [用户手册（开发流程与产物协议）](user-manual.zh.md)
+- [API 参考（函数与类型签名）](reference/)
+
 本地入口：
 
 - 生成脚本：[`scripts/gen_ref_pages.py`](https://github.com/ztxtech/ztxexp/blob/main/scripts/gen_ref_pages.py)

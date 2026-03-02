@@ -84,6 +84,13 @@ class RunContext:
     """单次实验运行上下文。
 
     该对象由 ``ExpRunner`` 在每个 run 开始时构造，并传入用户实验函数。
+    ``exp_fn`` 的推荐契约如下：
+
+    1. 函数签名：``exp_fn(ctx: RunContext) -> dict | None``；
+    2. 返回 ``dict`` 时框架会写入 ``metrics.json``；
+    3. 返回 ``None`` 时不写 ``metrics.json``，但 run 仍可成功；
+    4. 业务产物统一写入 ``ctx.run_dir / "artifacts"``；
+    5. 过程指标用 ``ctx.log_metric(...)`` 写入 ``metrics.jsonl``。
 
     Attributes:
         run_id: 当前运行唯一 ID（同时也是 run 目录名）。
@@ -116,14 +123,22 @@ class RunContext:
     ) -> None:
         """记录 step 级指标并通知 tracker。
 
+        该方法用于写入过程曲线数据，不替代 ``exp_fn`` 的最终 ``return dict``。
+        典型分工是：
+        1. ``ctx.log_metric`` 负责每步/每轮中间指标；
+        2. ``return dict`` 负责最终汇总指标。
+
         Args:
-            step: 当前 step。
-            metrics: 指标字典。
-            split: 数据划分。
-            phase: 运行阶段。
+            step: 当前 step（例如 epoch 或 global step）。
+            metrics: 指标字典，值应可转为 JSON（建议 ``float``）。
+            split: 数据划分，如 ``train/valid/test``。
+            phase: 阶段标识，如 ``fit/eval/infer``。
 
         Returns:
             None
+
+        Examples:
+            >>> ctx.log_metric(step=1, metrics={"loss": 0.91}, split="train", phase="fit")
         """
         event = MetricEvent(
             step=step,

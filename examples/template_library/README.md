@@ -9,6 +9,7 @@
 | `analysis/dataframe_csv_export.py` | DataFrame + CSV 导出 | 将 run 目录聚合为表格并导出 CSV。 |
 | `analysis/leaderboard_comparison.py` | 排行榜对比模板 | 快速生成 Top-K 配置列表，便于版本评审。 |
 | `analysis/pivot_excel_report.py` | 透视表 Excel 报告 | 按模型/超参数维度输出可读的透视表报告。 |
+| `basics/exp_fn_contract_matrix.py` | `exp_fn` 契约矩阵模板 | 一次性演示返回 dict / 返回 None / SkipRun / 异常失败四类结果与产物差异。 |
 | `basics/grid_and_variants.py` | 网格搜索 + 变体实验 | 同时遍历超参数网格和架构变体，适合 ablation 初期。 |
 | `basics/manager_runner_split.py` | 管理器与执行器解耦 | 当你需要先构建配置再交给不同 runner 时使用。 |
 | `basics/minimal_pipeline.py` | 最小可运行实验 | 用于快速验证环境、目录协议和基础执行链路。 |

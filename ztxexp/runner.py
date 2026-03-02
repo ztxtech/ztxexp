@@ -45,7 +45,18 @@ ExperimentFn = Callable[[RunContext], dict[str, Any] | None]
 
 
 class SkipRun(Exception):
-    """主动跳过当前运行。"""
+    """主动跳过当前运行。
+
+    在 ``exp_fn`` 中抛出该异常时，当前 run 会被标记为 ``skipped``，
+    而不是 ``failed``。适用于“业务上不合法、无需重试”的配置分支。
+
+    Examples:
+        >>> from ztxexp import SkipRun
+        >>> def exp_fn(ctx):
+        ...     if ctx.config.get("batch_size", 0) <= 0:
+        ...         raise SkipRun("batch_size must be positive")
+        ...     return {"score": 0.9}
+    """
 
 
 def _utc_now_iso() -> str:
@@ -419,7 +430,44 @@ class ExpRunner:
         tracker_specs: list[dict[str, Any]] | None = None,
         trackers: list[Tracker] | None = None,
     ) -> RunSummary:
-        """执行全部配置并返回汇总。"""
+        """执行全部配置并返回汇总。
+
+        Args:
+            exp_function: 单次实验函数，签名应为
+                ``exp_fn(ctx: RunContext) -> dict | None``。
+            mode: 执行模式。可选
+                ``sequential`` / ``process_pool`` / ``joblib`` / ``dynamic``。
+            workers: 并行 worker 数。
+            cpu_threshold: ``dynamic`` 模式提交新任务时的 CPU 阈值。
+            execution_mode: 兼容参数，等价于 ``mode``。
+            num_workers: 兼容参数，等价于 ``workers``。
+            dynamic_cpu_threshold: 兼容参数，等价于 ``cpu_threshold``。
+            metadata: 运行元数据模板。框架会补全可采集字段。
+            max_attempts: 每个配置最大尝试次数（失败重试上限）。
+            retry_on: 可重试异常名集合（支持父类名，如 ``Exception``）。
+            tracker_specs: 追踪器规格列表（字符串模式构造 tracker）。
+            trackers: 追踪器实例列表（当前进程内对象）。
+
+        Returns:
+            RunSummary: 本次批量执行汇总（成功/失败/跳过计数与耗时）。
+
+        Raises:
+            ValueError: 未提供 ``exp_function`` 或 ``mode`` 不合法时抛出。
+
+        Notes:
+            - ``exp_fn`` 返回 ``dict`` 时自动写入 ``metrics.json``；
+            - ``exp_fn`` 返回 ``None`` 时不写 ``metrics.json``；
+            - 返回非 ``dict|None`` 会判定为失败并写 ``error.log``；
+            - 抛出 ``SkipRun`` 会标记为 ``skipped``；
+            - 成功判定以 ``run.json.status == succeeded`` 为准。
+
+        Examples:
+            >>> def exp_fn(ctx: RunContext):
+            ...     return {"score": 0.9}
+            >>> summary = ExpRunner([{"lr": 0.001}], "./results").run(exp_fn)
+            >>> summary.total
+            1
+        """
         if execution_mode is not None:
             mode = execution_mode
         if num_workers is not None:

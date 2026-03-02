@@ -58,6 +58,7 @@ class ResultAnalyzer:
         """读取 run 目录并合并为记录列表。
 
         合并顺序：``config -> metrics -> run_meta``，后者覆盖前者同名键。
+        仅处理 ``schema_version == 2`` 的 run 目录。
 
         Args:
             statuses: 允许状态集合；传 ``None`` 表示不过滤状态。
@@ -67,7 +68,11 @@ class ResultAnalyzer:
             tags: 标签过滤条件。
 
         Returns:
-            list[dict[str, Any]]: 扁平化记录列表。
+            list[dict[str, Any]]: 扁平化记录列表。每条记录至少包含：
+                - 配置字段（来自 ``config.json``）；
+                - 指标字段（来自 ``metrics.json``，若文件存在）；
+                - 运行元字段（来自 ``run.json``，如 ``status/run_id``）；
+                - ``run_dir``（绝对路径字符串）。
 
         Examples:
             >>> records = ResultAnalyzer("./results_demo").to_records(statuses=None)
@@ -183,7 +188,13 @@ class ResultAnalyzer:
             tags: 标签过滤条件。
 
         Returns:
-            list[MetricEvent]: 事件列表。
+            list[MetricEvent]: 事件列表。仅返回结构合法的事件：
+                - ``step`` 必须是 ``int``；
+                - ``timestamp`` 必须是 ``str``；
+                - ``metrics`` 必须是 ``dict`` 且值可转为 ``float``。
+
+        Notes:
+            无效行会被跳过，不会抛出异常中断整个读取流程。
         """
         events: list[MetricEvent] = []
         target_statuses = set(statuses) if statuses is not None else None
@@ -250,6 +261,15 @@ class ResultAnalyzer:
 
         Returns:
             pd.DataFrame: 曲线数据表。
+                - 基础列始终包含：``run_id/timestamp/step/split/phase``；
+                - 当 ``metric_key`` 非空时，只返回该指标列；
+                - 当 ``metric_key`` 为空时，展开 ``metrics`` 的全部键。
+
+        Examples:
+            >>> analyzer = ResultAnalyzer("./results_demo")
+            >>> df = analyzer.to_curve_dataframe(metric_key="loss")
+            >>> set(["run_id", "step"]).issubset(df.columns) if not df.empty else True
+            True
         """
         rows: list[dict[str, Any]] = []
         target_statuses = set(statuses) if statuses is not None else None

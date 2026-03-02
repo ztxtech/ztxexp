@@ -4,7 +4,9 @@ import importlib.util
 import uuid
 from pathlib import Path
 
-from ztxexp import ExpRunner, RunContext, RunMetadata, utils
+import pytest
+
+from ztxexp import ExpRunner, RunContext, RunMetadata, SkipRun, utils
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_ROOT = ROOT / "examples" / "template_library"
@@ -84,3 +86,44 @@ def test_template_smoke_analysis_category(tmp_path, monkeypatch):
         module = _load_module(path)
         assert hasattr(module, "main")
         module.main()
+
+
+def test_exp_fn_contract_matrix_template(tmp_path):
+    path = TEMPLATE_ROOT / "basics" / "exp_fn_contract_matrix.py"
+    module = _load_module(path)
+    assert hasattr(module, "exp_fn")
+
+    ctx_metrics = _make_ctx(tmp_path, {"scenario": "return_metrics", "lr": 0.001})
+    try:
+        result_metrics = module.exp_fn(ctx_metrics)
+        assert isinstance(result_metrics, dict)
+        assert "score" in result_metrics
+        assert (ctx_metrics.run_dir / "artifacts" / "return_metrics.json").exists()
+    finally:
+        _close_ctx_logger(ctx_metrics)
+
+    ctx_stream = _make_ctx(tmp_path, {"scenario": "stream_only", "lr": 0.005})
+    try:
+        result_stream = module.exp_fn(ctx_stream)
+        assert result_stream is None
+        assert (ctx_stream.run_dir / "artifacts" / "stream_only.json").exists()
+        rows = utils.load_jsonl(ctx_stream.run_dir / "metrics.jsonl", skip_invalid=True)
+        assert len(rows) >= 2
+    finally:
+        _close_ctx_logger(ctx_stream)
+
+    ctx_skip = _make_ctx(tmp_path, {"scenario": "skip", "lr": 0.01})
+    try:
+        with pytest.raises(SkipRun):
+            module.exp_fn(ctx_skip)
+        assert (ctx_skip.run_dir / "artifacts" / "skip.json").exists()
+    finally:
+        _close_ctx_logger(ctx_skip)
+
+    ctx_fail = _make_ctx(tmp_path, {"scenario": "fail", "lr": 0.02})
+    try:
+        with pytest.raises(RuntimeError):
+            module.exp_fn(ctx_fail)
+        assert (ctx_fail.run_dir / "artifacts" / "fail.json").exists()
+    finally:
+        _close_ctx_logger(ctx_fail)

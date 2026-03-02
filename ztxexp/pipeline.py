@@ -189,7 +189,11 @@ class ExperimentPipeline:
         """构建配置并执行实验。
 
         Args:
-            exp_fn: 单次实验函数，签名为 ``exp_fn(ctx: RunContext)``。
+            exp_fn: 单次实验函数，签名为 ``exp_fn(ctx: RunContext) -> dict | None``。
+                - 返回 ``dict``：框架写入 ``metrics.json``；
+                - 返回 ``None``：不写 ``metrics.json``；
+                - 返回其他类型：判定为失败并写 ``error.log``；
+                - 抛出 ``SkipRun``：判定为 ``skipped``。
             mode: 执行模式，支持 ``sequential`` / ``process_pool`` /
                 ``joblib`` / ``dynamic``。
             workers: 并行 worker 数量。
@@ -197,6 +201,10 @@ class ExperimentPipeline:
 
         Returns:
             RunSummary: 批量执行汇总信息。
+
+        Notes:
+            用户业务文件建议统一写入 ``ctx.run_dir / \"artifacts\"``；
+            过程曲线建议使用 ``ctx.log_metric(...)`` 写入 ``metrics.jsonl``。
 
         Examples:
             >>> def exp_fn(ctx: RunContext):
