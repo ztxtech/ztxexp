@@ -35,7 +35,7 @@ jobs:
         run: mkdocs build --strict
 
       - name: Build package
-        run: python -m build --no-isolation
+        run: python -m build
 
       - name: Twine check
         run: twine check dist/*

@@ -12,37 +12,16 @@ theme:
   language: zh
   logo: etc/images/logo.png
   favicon: etc/images/favicon.png
-  icon:
-    repo: fontawesome/brands/github
-  font:
-    text: Noto Sans SC
-    code: JetBrains Mono
   palette:
-    - scheme: default
-      primary: deep purple
-      accent: indigo
-      toggle:
-        icon: material/weather-night
-        name: 切换到深色模式
-    - scheme: slate
-      primary: deep purple
-      accent: indigo
-      toggle:
-        icon: material/weather-sunny
-        name: 切换到浅色模式
+    scheme: default
+    primary: blue grey
+    accent: teal
   features:
-    - navigation.instant
-    - navigation.instant.progress
-    - navigation.tracking
     - navigation.tabs
     - navigation.sections
-    - navigation.expand
     - navigation.top
-    - toc.follow
     - search.suggest
     - search.highlight
-    - content.code.annotate
-    - content.code.copy
 
 nav:
   - 首页: index.md
@@ -93,9 +72,6 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
-
-extra_css:
-  - stylesheets/extra.css
 
 watch:
   - ztxexp
