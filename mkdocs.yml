@@ -10,8 +10,8 @@ site_dir: docs
 theme:
   name: material
   language: zh
-  logo: etc/images/favicon.png
-  favicon: etc/images/favicon.png
+  logo: https://cdn.jsdelivr.net/gh/ztxtech/ztxexp@main/etc/images/favicon.png
+  favicon: https://cdn.jsdelivr.net/gh/ztxtech/ztxexp@main/etc/images/favicon.png
   palette:
     scheme: default
     primary: indigo

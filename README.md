@@ -1,7 +1,7 @@
 # ztxexp
 
 <p align="center">
-  <img src="etc/images/logo.png" alt="ztxexp logo" width="180" />
+  <img src="https://cdn.jsdelivr.net/gh/ztxtech/ztxexp@main/etc/images/logo.png" alt="ztxexp logo" width="180" />
 </p>
 
 [![PyPI version](https://badge.fury.io/py/ztxexp.svg)](https://badge.fury.io/py/ztxexp)
