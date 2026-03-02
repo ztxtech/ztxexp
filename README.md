@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 13:40:53 (Asia/Shanghai): 版本基线升级为 `1.0.0`，用于修复历史版本号（`0.30.0` 与 `0.4.0`）导致的升级顺序歧义，确保包管理器始终选择正确的最新版本。
 - 2026-03-02 12:22:22 (Asia/Shanghai): 完成 `v0.4.0` 发布级收口，新增 CI 工作流（`ruff + pytest + mkdocs --strict + build + twine check`）与模板 smoke tests；同时修正依赖分层，`mlflow/wandb` 保持为可选 extras，不再随 `dev` 默认安装。
 - 2026-03-02 11:56:15 (Asia/Shanghai): 发布 `v0.4.0` 复现与治理闭环能力：新增 `RunMetadata/MetricEvent`、`meta.json/metrics.jsonl/events.jsonl`、`ctx.log_metric(...)`、`name/group/tags/lineage/retry/random_search/track` 等接口，并提供 `JsonlTracker` + 可选 `MlflowTracker/WandbTracker`。
 - 2026-03-02 01:25:15 (Asia/Shanghai): 新增 `examples/template_library` 可复制模板库（27 个场景模板），覆盖基础构建、并行调度、分析清理、ML、LLM、工程运维。

@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.0 - 2026-03-02
+
+### Breaking
+
+- None.
+
+### Added
+
+- None.
+
+### Fixed
+
+- Fixed release ordering confusion caused by historical `0.30.0` and `0.4.0` coexistence.
+- Normalized package versioning baseline to `1.0.0` to ensure unambiguous upgrade ordering on package index.
+
+### Docs
+
+- None.
+
+### Migration
+
+- Users on `0.30.0` / `0.4.0` can upgrade directly to `1.0.0` with:
+  - `pip install -U ztxexp`
+
 ## 0.4.0 - 2026-03-02
 
 ### Breaking
