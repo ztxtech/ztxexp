@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 20:05:00 (Asia/Shanghai): 发布 `v1.0.3` 交互式 Command-Line 模板向导，新增 `ztxexp init-template`，通过 7 问配置（消融、模块、模式、指标、追踪器）拼装可运行实验骨架，并提供软依赖检查（`init-vibe/init-skill` 缺失仅告警不阻断）、`--dry-run`、受管覆盖保护与 `--force` 接管能力。
 - 2026-03-02 16:15:33 (Asia/Shanghai): 发布 `v1.0.2` skills 生态支持，新增 `ztxexp init-skill/show-skill/remove-skill`，可将内置 `ztx-exp-manager` skill 注入到用户项目；`init-skill` 在未指定 `--target` 时支持交互选择写入 `skills/`、`.codex/skills/` 或两处同时写入，并提供受管标记与安全删除策略。
 - 2026-03-02 15:28:11 (Asia/Shanghai): 发布 `v1.0.1` CLI 能力，新增 `ztxexp init-vibe/show-vibe/remove-vibe`，可在任意目标项目中持久化写入（或移除）Agent 使用区块，支持 `profile/language/project-root/agents-file/dry-run` 参数。
 - 2026-03-02 13:40:53 (Asia/Shanghai): 版本基线升级为 `1.0.0`，用于修复历史版本号（`0.30.0` 与 `0.4.0`）导致的升级顺序歧义，确保包管理器始终选择正确的最新版本。
@@ -122,6 +123,31 @@ ztxexp init-skill --dry-run
 ztxexp remove-skill --dry-run
 ```
 
+### CLI：交互式模板向导（v1.0.3）
+
+```bash
+# 交互式 7 问向导（推荐）
+ztxexp init-template
+
+# 非交互模式（需要显式传 name）
+ztxexp init-template --name my_experiment --no-interactive
+
+# 快速采用推荐默认值（含交互模式）
+ztxexp init-template --name my_experiment --yes
+
+# 仅预览生成计划，不落盘
+ztxexp init-template --name my_experiment --no-interactive --dry-run
+
+# 指定输出目录
+ztxexp init-template --name my_experiment --output-dir experiments_custom
+
+# 目录已存在时强制接管覆盖
+ztxexp init-template --name my_experiment --no-interactive --force
+```
+
+生成目录默认位于：`<project-root>/experiments/<experiment_name>/`。  
+主脚本 `main_experiment.py` 内置 `run/analyze/clean` 子命令，可直接执行实验、结果聚合与清理示例。
+
 参数说明（`init-vibe` / `remove-vibe`）：
 
 - `--project-root PATH`：目标项目目录，默认当前工作目录。
@@ -148,6 +174,16 @@ ztxexp remove-skill --dry-run
 - `--target {skills,codex,both}`：删除范围；不传时默认 `both`。
 - `--dry-run`：仅预览将删除的目标。
 - `--force`：允许删除未受管目录（默认仅删除受管安装）。
+
+参数说明（`init-template`）：
+
+- `--project-root PATH`：目标项目目录，默认当前工作目录。
+- `--name NAME`：模板名称；交互模式可不传，`--no-interactive` 时必须传。
+- `--output-dir PATH`：输出根目录，默认 `<project-root>/experiments`。
+- `--dry-run`：仅预览目录与文件计划，不写入文件。
+- `--no-interactive`：关闭交互问答并采用推荐默认配置。
+- `--force`：目标目录已存在且未受管时允许接管覆盖。
+- `--yes`：交互模式下所有问题采用推荐默认值，加速初始化。
 
 受管区块标记：
 

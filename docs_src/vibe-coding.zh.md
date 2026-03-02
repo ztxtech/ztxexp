@@ -37,6 +37,28 @@ ztxexp init-skill
 - `skills/ztx-exp-manager/SKILL.md` 或 `.codex/skills/ztx-exp-manager/SKILL.md` 已生成。
 - skill 目录包含受管标记 `.ztxexp-managed-skill.json`（由 `init-skill` 写入）。
 
+### 步骤 D：生成可运行模板骨架（v1.0.3）
+
+```bash
+ztxexp init-template
+```
+
+该命令会通过 7 个问题拼装实验模板，默认落盘到：
+
+`<project-root>/experiments/<experiment_name>/`
+
+如果你在 CI 或脚本环境中使用，可关闭交互并显式传入模板名：
+
+```bash
+ztxexp init-template --name my_experiment --no-interactive
+```
+
+如果希望在交互模式中快速采用推荐配置：
+
+```bash
+ztxexp init-template --name my_experiment --yes
+```
+
 ## `init-skill` 三选一策略
 
 当你执行 `ztxexp init-skill` 且不传 `--target` 时，可选：
@@ -68,6 +90,7 @@ ztxexp init-skill --target both
 ```bash
 ztxexp init-vibe
 ztxexp init-skill
+ztxexp init-template
 ```
 
 ### 预览
@@ -76,6 +99,7 @@ ztxexp init-skill
 ztxexp show-vibe --profile webcoding --language bilingual
 ztxexp show-skill --language bilingual
 ztxexp show-skill --language zh --with-openai
+ztxexp init-template --name my_experiment --no-interactive --dry-run
 ```
 
 ### 回滚
@@ -91,6 +115,7 @@ ztxexp remove-skill
 ztxexp init-vibe --dry-run
 ztxexp init-skill --dry-run --target both
 ztxexp remove-skill --dry-run --target both
+ztxexp init-template --name my_experiment --no-interactive --dry-run
 ```
 
 ### `--force` 使用边界
@@ -98,6 +123,7 @@ ztxexp remove-skill --dry-run --target both
 - 默认策略：仅更新/删除受管目录（有 `.ztxexp-managed-skill.json`）。
 - 当目标目录是历史手工内容或第三方内容时，默认会 `skipped_unmanaged`。
 - 只有你明确要接管这些目录时，才使用 `--force`。
+- 对 `init-template` 也是同样原则：已有未受管模板目录时默认拒绝覆盖，显式 `--force` 才会接管。
 
 ## Agent 协作约束（实践规范）
 

@@ -16,6 +16,18 @@ from ztxexp.skill import (
     render_openai_yaml,
     show_skill,
 )
+from ztxexp.template_wizard import (
+    ask_template_questions,
+    build_template_plan,
+    check_init_prerequisites,
+    create_template_scaffold,
+)
+from ztxexp.template_wizard import (
+    is_interactive_terminal as is_template_interactive_terminal,
+)
+from ztxexp.template_wizard import (
+    resolve_project_root as resolve_template_project_root,
+)
 from ztxexp.vibe import (
     SUPPORTED_LANGUAGES,
     SUPPORTED_PROFILES,
@@ -153,6 +165,49 @@ def build_parser() -> argparse.ArgumentParser:
         help="Remove installed ztx-exp-manager skill from target project.",
     )
 
+    init_template_parser = subparsers.add_parser(
+        "init-template",
+        help="Interactive command-line template wizard for experiment scaffold generation.",
+    )
+    init_template_parser.add_argument(
+        "--project-root",
+        type=str,
+        default=None,
+        help="Target project root directory. Default: current working directory.",
+    )
+    init_template_parser.add_argument(
+        "--name",
+        type=str,
+        default=None,
+        help="Experiment template name. If omitted, interactive mode asks for it.",
+    )
+    init_template_parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output root directory. Default: <project-root>/experiments.",
+    )
+    init_template_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview generated scaffold without writing files.",
+    )
+    init_template_parser.add_argument(
+        "--no-interactive",
+        action="store_true",
+        help="Disable questionnaire prompts. Requires --name.",
+    )
+    init_template_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow overwrite when target template directory exists and is unmanaged.",
+    )
+    init_template_parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Use recommended defaults for all wizard questions.",
+    )
+
     return parser
 
 
@@ -166,6 +221,11 @@ def _print_skill_results(command: str, result) -> None:
         f"[{command}] project_root={result.project_root}, "
         f"target_mode={result.target_mode}, dry_run={result.dry_run}"
     )
+    for line in result.summary_lines():
+        print(f"[{command}] {line}")
+
+
+def _print_template_result(command: str, result) -> None:
     for line in result.summary_lines():
         print(f"[{command}] {line}")
 
@@ -246,6 +306,49 @@ def _handle_remove_skill(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_init_template(args: argparse.Namespace) -> int:
+    project_root = resolve_template_project_root(args.project_root)
+
+    if args.no_interactive and not args.name:
+        raise ValueError("`--no-interactive` requires `--name`.")
+
+    if args.no_interactive:
+        answers = ask_template_questions(name=args.name, yes=True)
+    elif args.yes:
+        answers = ask_template_questions(name=args.name, yes=True)
+    elif is_template_interactive_terminal():
+        answers = ask_template_questions(name=args.name, yes=False)
+    else:
+        if not args.name:
+            raise ValueError(
+                "interactive terminal unavailable; provide `--name` with `--no-interactive`."
+            )
+        print(
+            "[init-template] interactive terminal unavailable, "
+            "using recommended defaults with provided --name."
+        )
+        answers = ask_template_questions(name=args.name, yes=True)
+
+    warnings = check_init_prerequisites(project_root)
+    for warning in warnings:
+        print(f"[init-template] warning={warning}")
+
+    plan = build_template_plan(
+        answers=answers,
+        project_root=project_root,
+        output_dir=args.output_dir,
+    )
+    result = create_template_scaffold(
+        plan=plan,
+        answers=answers,
+        dry_run=args.dry_run,
+        force=args.force,
+        warnings=warnings,
+    )
+    _print_template_result("init-template", result)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI main entrypoint."""
     parser = build_parser()
@@ -264,6 +367,8 @@ def main(argv: list[str] | None = None) -> int:
             return _handle_show_skill(args)
         if args.command == "remove-skill":
             return _handle_remove_skill(args)
+        if args.command == "init-template":
+            return _handle_init_template(args)
         parser.error(f"Unknown command: {args.command}")
         return 2
     except ValueError as exc:

@@ -13,6 +13,7 @@ def test_vibe_coding_doc_contains_required_sections():
     required_keywords = [
         "init-vibe",
         "init-skill",
+        "init-template",
         "skills/",
         ".codex/skills/",
         "run.json.status",

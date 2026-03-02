@@ -1,5 +1,47 @@
 # Changelog
 
+## 1.0.3 - 2026-03-02
+
+### Breaking
+
+- None.
+
+### Added
+
+- Added interactive Command-Line template wizard:
+  - `ztxexp init-template`
+  - 7-question guided scaffold assembly for experiment scripts
+- Added generated experiment skeleton protocol under `experiments/<name>/`:
+  - `main_experiment.py` (with `run/analyze/clean` subcommands)
+  - `configs/base.json`
+  - `artifacts/.gitkeep`
+  - optional `models/.gitkeep`
+  - `modules/<module>/__init__.py` stubs
+- Added soft prerequisite checks for vibe/skill initialization:
+  - missing `init-vibe` / `init-skill` only emits warnings and does not block template generation
+- Added template management marker:
+  - `.ztxexp-managed-template.json`
+  - safe overwrite guard for unmanaged directories (`--force` required)
+- Added automated tests for template CLI workflow:
+  - `tests/test_cli_template.py`
+
+### Fixed
+
+- Improved non-interactive robustness for template initialization:
+  - `--no-interactive` now requires explicit `--name` to avoid accidental anonymous scaffold creation.
+
+### Docs
+
+- Added `init-template` usage to README CLI section.
+- Added Vibe Coding workflow section: `init-vibe -> init-skill -> init-template`.
+
+### Migration
+
+- Upgrade directly from `1.0.2`:
+  - `pip install -U ztxexp`
+- Quick scaffold generation:
+  - `ztxexp init-template --name my_experiment --no-interactive`
+
 ## 1.0.2 - 2026-03-02
 
 ### Breaking
