@@ -1,78 +1,47 @@
-/* ztxexp docs visual polish for MkDocs Material */
+/* ztxexp docs theme tuning: keep Material layout, align color with logo. */
 
-:root {
-  --ztxexp-gradient-a: rgba(37, 99, 235, 0.08);
-  --ztxexp-gradient-b: rgba(13, 148, 136, 0.1);
-  --ztxexp-card-border: rgba(15, 23, 42, 0.12);
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #8c82f6;
+  --md-primary-fg-color--light: #b7b1fb;
+  --md-primary-fg-color--dark: #766ce2;
+  --md-accent-fg-color: #9d92ff;
+  --md-typeset-a-color: #776ae9;
 }
 
 [data-md-color-scheme="slate"] {
-  --ztxexp-gradient-a: rgba(56, 189, 248, 0.14);
-  --ztxexp-gradient-b: rgba(20, 184, 166, 0.14);
-  --ztxexp-card-border: rgba(148, 163, 184, 0.25);
+  --md-primary-fg-color: #7b70ef;
+  --md-primary-fg-color--light: #9b92f4;
+  --md-primary-fg-color--dark: #655bd7;
+  --md-accent-fg-color: #c2bbff;
+  --md-typeset-a-color: #c7c0ff;
 }
 
 .md-main__inner {
-  margin-top: 1rem;
-}
-
-.md-content__inner {
-  border-radius: 14px;
-  padding: 1rem 1.2rem 2rem;
-  background:
-    radial-gradient(circle at top right, var(--ztxexp-gradient-a), transparent 42%),
-    radial-gradient(circle at left center, var(--ztxexp-gradient-b), transparent 36%);
+  margin-top: 0.6rem;
 }
 
 .md-typeset h1 {
-  font-weight: 800;
-  letter-spacing: 0.015em;
-  margin-bottom: 0.8rem;
+  font-weight: 780;
+  letter-spacing: 0.01em;
 }
 
 .md-typeset h2 {
-  font-weight: 760;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-}
-
-.md-typeset h3 {
   font-weight: 700;
 }
 
 .md-typeset p code,
 .md-typeset li code,
 .md-typeset td code {
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 .md-typeset .admonition,
-.md-typeset details {
-  border-radius: 12px;
-  border: 1px solid var(--ztxexp-card-border);
-}
-
-.md-typeset table:not([class]) {
-  border: 1px solid var(--ztxexp-card-border);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-}
-
-.md-typeset table:not([class]) th {
-  font-weight: 700;
-}
-
+.md-typeset details,
+.md-typeset table:not([class]),
 .md-typeset pre > code {
-  border-radius: 12px;
-}
-
-.md-search-result__article--document {
   border-radius: 10px;
 }
 
-@media screen and (max-width: 76.1875em) {
-  .md-content__inner {
-    padding: 0.8rem 0.8rem 1.6rem;
-  }
+.md-search__form {
+  border-radius: 10px;
 }

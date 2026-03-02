@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 12:55:48 (Asia/Shanghai): 调整 MkDocs Material 视觉为“logo 同系淡紫主题”，主导航栏与链接色改为紫蓝渐变对应色，并移除过度装饰的内容背景，整体回归官方 Material 的简洁版式。
 - 2026-03-02 12:40:33 (Asia/Shanghai): 接入项目 logo：README 顶部新增品牌图，MkDocs Material 主题新增 `logo/favicon` 配置，并将图片同步到 `docs_src/etc/images/`，保证文档站点与仓库页面均可正常显示。
 - 2026-03-02 12:34:25 (Asia/Shanghai): 升级 MkDocs Material 站点视觉与交互：新增亮/暗主题切换、增强导航与代码体验、启用 `pymdownx` 扩展，并接入自定义样式 `docs_src/stylesheets/extra.css` 提升首页与 API 页可读性。
 - 2026-03-02 12:22:22 (Asia/Shanghai): 完成 `v0.4.0` 发布级收口，新增 CI 工作流（`ruff + pytest + mkdocs --strict + build + twine check`）与模板 smoke tests；同时修正依赖分层，`mlflow/wandb` 保持为可选 extras，不再随 `dev` 默认安装。
