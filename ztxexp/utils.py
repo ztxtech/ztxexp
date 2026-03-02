@@ -22,7 +22,7 @@ import tempfile
 import time
 from contextlib import contextmanager
 from dataclasses import asdict, is_dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
@@ -281,6 +281,11 @@ def format_time_delta(seconds: float) -> str:
     m = int((seconds % 3600) // 60)
     s = int(seconds % 60)
     return f"{h}h {m}m {s}s"
+
+
+def utc_now_iso() -> str:
+    """返回当前 UTC 时间的 ISO8601 字符串。"""
+    return datetime.now(timezone.utc).isoformat()
 
 
 def get_memory_usage() -> str:

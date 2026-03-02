@@ -10,7 +10,8 @@ from ztxexp.environment import init_torch_env, set_process_priority
 from ztxexp.manager import ExpManager
 from ztxexp.pipeline import ExperimentPipeline
 from ztxexp.runner import ExpRunner, SkipRun
-from ztxexp.types import RunContext, RunSummary
+from ztxexp.tracking import JsonlTracker, MlflowTracker, Tracker, WandbTracker
+from ztxexp.types import MetricEvent, RunContext, RunMetadata, RunSummary
 
 # from ztxexp import * 的公开符号集合。
 __all__ = [
@@ -19,11 +20,17 @@ __all__ = [
     "ResultAnalyzer",
     "ExperimentPipeline",
     "RunContext",
+    "RunMetadata",
+    "MetricEvent",
     "RunSummary",
     "SkipRun",
+    "Tracker",
+    "JsonlTracker",
+    "MlflowTracker",
+    "WandbTracker",
     "init_torch_env",
     "set_process_priority",
 ]
 
 # 包版本号，供运行时查询。
-__version__ = "0.3.0"
+__version__ = "0.4.0"

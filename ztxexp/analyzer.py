@@ -22,6 +22,7 @@ from ztxexp.constants import (
     RUN_STATUS_SKIPPED,
     RUN_STATUS_SUCCEEDED,
 )
+from ztxexp.types import MetricEvent
 
 # 清理函数签名：输入单条扁平记录，返回是否删除。
 RecordPredicate = Callable[[dict[str, Any]], bool]
@@ -50,6 +51,9 @@ class ResultAnalyzer:
         self,
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
+        experiment_name: str | None = None,
+        group: str | None = None,
+        tags: dict[str, str] | list[str] | None = None,
     ) -> list[dict[str, Any]]:
         """读取 run 目录并合并为记录列表。
 
@@ -58,6 +62,9 @@ class ResultAnalyzer:
         Args:
             statuses: 允许状态集合；传 ``None`` 表示不过滤状态。
             metrics_filename: 指标文件名，默认 ``metrics.json``。
+            experiment_name: 实验名称过滤条件。
+            group: 分组过滤条件。
+            tags: 标签过滤条件。
 
         Returns:
             list[dict[str, Any]]: 扁平化记录列表。
@@ -78,6 +85,12 @@ class ResultAnalyzer:
             status = record.get("status")
             if target_statuses is not None and status not in target_statuses:
                 continue
+            if experiment_name and record.get("experiment_name") != experiment_name:
+                continue
+            if group and record.get("group") != group:
+                continue
+            if tags and not self._tags_match(record.get("tags"), tags):
+                continue
 
             records.append(record)
 
@@ -87,6 +100,9 @@ class ResultAnalyzer:
         self,
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
+        experiment_name: str | None = None,
+        group: str | None = None,
+        tags: dict[str, str] | list[str] | None = None,
     ) -> pd.DataFrame:
         """将记录列表转为 DataFrame。
 
@@ -97,7 +113,13 @@ class ResultAnalyzer:
         Returns:
             pd.DataFrame: 聚合后的数据表；若无数据返回空 DataFrame。
         """
-        records = self.to_records(statuses=statuses, metrics_filename=metrics_filename)
+        records = self.to_records(
+            statuses=statuses,
+            metrics_filename=metrics_filename,
+            experiment_name=experiment_name,
+            group=group,
+            tags=tags,
+        )
         if not records:
             return pd.DataFrame()
         return pd.DataFrame.from_records(records)
@@ -108,6 +130,9 @@ class ResultAnalyzer:
         sort_by: Sequence[str] | None = None,
         statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
         metrics_filename: str = "metrics.json",
+        experiment_name: str | None = None,
+        group: str | None = None,
+        tags: dict[str, str] | list[str] | None = None,
     ) -> pd.DataFrame:
         """导出 CSV，并返回导出所用 DataFrame。
 
@@ -120,7 +145,13 @@ class ResultAnalyzer:
         Returns:
             pd.DataFrame: 导出用 DataFrame（可能为空）。
         """
-        df = self.to_dataframe(statuses=statuses, metrics_filename=metrics_filename)
+        df = self.to_dataframe(
+            statuses=statuses,
+            metrics_filename=metrics_filename,
+            experiment_name=experiment_name,
+            group=group,
+            tags=tags,
+        )
         if df.empty:
             print("No records found to export.")
             return df
@@ -133,6 +164,137 @@ class ResultAnalyzer:
         df.to_csv(output_path, index=False)
         print(f"Saved CSV to {output_path}")
         return df
+
+    def to_metric_events(
+        self,
+        statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
+        metrics_stream_filename: str = "metrics.jsonl",
+        experiment_name: str | None = None,
+        group: str | None = None,
+        tags: dict[str, str] | list[str] | None = None,
+    ) -> list[MetricEvent]:
+        """读取 step 级指标事件。
+
+        Args:
+            statuses: 状态过滤条件。
+            metrics_stream_filename: 指标流文件名，默认 ``metrics.jsonl``。
+            experiment_name: 实验名称过滤条件。
+            group: 分组过滤条件。
+            tags: 标签过滤条件。
+
+        Returns:
+            list[MetricEvent]: 事件列表。
+        """
+        events: list[MetricEvent] = []
+        target_statuses = set(statuses) if statuses is not None else None
+
+        for run_dir in utils.get_subdirectories(self.results_path):
+            run_meta = utils.load_json(run_dir / "run.json")
+            if not run_meta:
+                continue
+            if run_meta.get("schema_version") != RUN_SCHEMA_VERSION:
+                continue
+            if target_statuses is not None and run_meta.get("status") not in target_statuses:
+                continue
+            if experiment_name and run_meta.get("experiment_name") != experiment_name:
+                continue
+            if group and run_meta.get("group") != group:
+                continue
+            if tags and not self._tags_match(run_meta.get("tags"), tags):
+                continue
+
+            rows = utils.load_jsonl(run_dir / metrics_stream_filename, skip_invalid=True)
+            for row in rows:
+                metrics = row.get("metrics")
+                step = row.get("step")
+                timestamp = row.get("timestamp")
+                if not isinstance(metrics, dict):
+                    continue
+                if not isinstance(step, int):
+                    continue
+                if not isinstance(timestamp, str):
+                    continue
+                try:
+                    events.append(
+                        MetricEvent(
+                            step=step,
+                            timestamp=timestamp,
+                            metrics={k: float(v) for k, v in metrics.items()},
+                            split=str(row.get("split", "train")),
+                            phase=str(row.get("phase", "fit")),
+                        )
+                    )
+                except Exception:
+                    continue
+
+        return events
+
+    def to_curve_dataframe(
+        self,
+        metric_key: str | None = None,
+        statuses: Sequence[str] | None = (RUN_STATUS_SUCCEEDED,),
+        metrics_stream_filename: str = "metrics.jsonl",
+        experiment_name: str | None = None,
+        group: str | None = None,
+        tags: dict[str, str] | list[str] | None = None,
+    ) -> pd.DataFrame:
+        """将 step 级指标事件转为曲线 DataFrame。
+
+        Args:
+            metric_key: 指标键。若为空则展开全部指标。
+            statuses: 状态过滤条件。
+            metrics_stream_filename: 指标流文件名。
+            experiment_name: 实验名称过滤条件。
+            group: 分组过滤条件。
+            tags: 标签过滤条件。
+
+        Returns:
+            pd.DataFrame: 曲线数据表。
+        """
+        rows: list[dict[str, Any]] = []
+        target_statuses = set(statuses) if statuses is not None else None
+
+        for run_dir in utils.get_subdirectories(self.results_path):
+            run_meta = utils.load_json(run_dir / "run.json")
+            if not run_meta:
+                continue
+            if run_meta.get("schema_version") != RUN_SCHEMA_VERSION:
+                continue
+            if target_statuses is not None and run_meta.get("status") not in target_statuses:
+                continue
+            if experiment_name and run_meta.get("experiment_name") != experiment_name:
+                continue
+            if group and run_meta.get("group") != group:
+                continue
+            if tags and not self._tags_match(run_meta.get("tags"), tags):
+                continue
+
+            run_id = str(run_meta.get("run_id") or run_dir.name)
+            records = utils.load_jsonl(run_dir / metrics_stream_filename, skip_invalid=True)
+            for record in records:
+                metrics = record.get("metrics")
+                if not isinstance(metrics, dict):
+                    continue
+
+                base = {
+                    "run_id": run_id,
+                    "timestamp": record.get("timestamp"),
+                    "step": record.get("step"),
+                    "split": record.get("split", "train"),
+                    "phase": record.get("phase", "fit"),
+                }
+                if metric_key:
+                    if metric_key in metrics:
+                        base[metric_key] = metrics[metric_key]
+                        rows.append(base)
+                else:
+                    expanded = dict(base)
+                    expanded.update(metrics)
+                    rows.append(expanded)
+
+        if not rows:
+            return pd.DataFrame()
+        return pd.DataFrame.from_records(rows)
 
     def to_pivot_excel(
         self,
@@ -316,3 +478,27 @@ class ResultAnalyzer:
         record.update(run_meta)
         record["run_dir"] = str(run_dir.resolve())
         return record
+
+    def _tags_match(
+        self,
+        record_tags: Any,
+        target_tags: dict[str, str] | list[str],
+    ) -> bool:
+        """判断标签是否匹配。"""
+        if isinstance(target_tags, dict):
+            if not isinstance(record_tags, dict):
+                return False
+            for key, value in target_tags.items():
+                if str(record_tags.get(key)) != str(value):
+                    return False
+            return True
+
+        if isinstance(target_tags, list):
+            if isinstance(record_tags, list):
+                return all(tag in record_tags for tag in target_tags)
+            if isinstance(record_tags, dict):
+                values = set(record_tags.values()) | set(record_tags.keys())
+                return all(tag in values for tag in target_tags)
+            return False
+
+        return False

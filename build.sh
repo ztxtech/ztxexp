@@ -1,8 +1,8 @@
-#!/usr/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Ensure stale artifacts from previous failed builds don't get uploaded.
 rm -rf build dist *.egg-info
 
-python -m build
-twine check dist/*
-twine upload dist/*
+python -m build --no-isolation
+python -m twine check dist/*
+python -m twine upload dist/*

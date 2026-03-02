@@ -1,5 +1,63 @@
 # Changelog
 
+## 0.4.0 - 2026-03-02
+
+### Breaking
+
+- None.
+
+### Added
+
+- Added reproducibility/governance dataclasses:
+  - `RunMetadata`
+  - `MetricEvent`
+- Added `RunContext` enhancements:
+  - `meta`
+  - `log_metric(step, metrics, split, phase)`
+- Added run artifact extensions (schema v2 compatible):
+  - `meta.json`
+  - `metrics.jsonl`
+  - `events.jsonl`
+  - `checkpoints/`
+- Added `ExperimentPipeline` governance APIs:
+  - `name(...)`, `group(...)`, `tags(...)`, `lineage(...)`
+  - `retry(...)`, `track(...)`, `random_search(...)`
+- Added tracker system:
+  - `Tracker` protocol
+  - built-in `JsonlTracker`
+  - optional `MlflowTracker` / `WandbTracker` adapters
+- Added CI workflow:
+  - `ruff check .`
+  - `pytest`
+  - `mkdocs build --strict`
+  - `python -m build --no-isolation`
+  - `twine check dist/*`
+- Added migration guide:
+  - `docs_src/migration-v04.zh.md`
+- Added template smoke test suite:
+  - `tests/test_templates_smoke.py`
+
+### Fixed
+
+- Fixed docs build hard-failure by restoring `docs_src/` directory.
+- Fixed mismatch between changelog quality claims and actual CI presence.
+- Improved analyzer query capability with `experiment_name/group/tags` filters.
+- Improved template docs generation with scenario copy matrix page.
+- Refined dependency layering: `mlflow/wandb` remain optional extras and are no longer installed via `dev` by default.
+
+### Docs
+
+- README now includes v0.4 governance and reproducibility features.
+- Template docs now include `场景复制矩阵` for direct copy commands.
+
+### Migration
+
+- Existing `0.3` API usage remains valid; upgrades are additive.
+- Recommended migration:
+  1. Add governance metadata (`name/group/tags/lineage`).
+  2. Replace manual step logs with `ctx.log_metric(...)`.
+  3. Enable optional trackers via extras when needed.
+
 ## 0.3.0 - 2026-03-02
 
 ### Changed

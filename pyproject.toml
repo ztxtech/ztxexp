@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ztxexp"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     { name = "ztxtech", email = "ztxtech@foxmail.com" },
 ]
@@ -55,6 +55,12 @@ docs = [
 ]
 excel = [
     "openpyxl>=3.1",
+]
+mlflow = [
+    "mlflow>=2.14",
+]
+wandb = [
+    "wandb>=0.17",
 ]
 dev = [
     "build>=1.2",

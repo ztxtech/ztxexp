@@ -71,3 +71,20 @@ def test_config_equality_requires_same_keyset(tmp_path):
     )
 
     assert configs == [{"lr": 0.001, "model": "tiny"}]
+
+
+def test_random_search_builds_expected_trials():
+    manager = ExpManager({"seed": 1}).random_search(
+        {
+            "lr": [0.001, 0.01],
+            "model": ["tiny", "base"],
+        },
+        n_trials=5,
+        seed=123,
+    )
+    configs = manager.build()
+
+    assert len(configs) == 5
+    assert all(cfg["lr"] in {0.001, 0.01} for cfg in configs)
+    assert all(cfg["model"] in {"tiny", "base"} for cfg in configs)
+    assert all(cfg["seed"] == 1 for cfg in configs)

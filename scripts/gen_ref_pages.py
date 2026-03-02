@@ -94,6 +94,7 @@ def _write_template_library() -> None:
     """生成示例模板库文档页面。"""
     template_nav = mkdocs_gen_files.Nav()
     docs_root = Path("examples-lib")
+    matrix_rows: list[tuple[str, str, str]] = []
 
     with mkdocs_gen_files.open(docs_root / "index.md", "w") as file_obj:
         file_obj.write("# 示例模板库\n\n")
@@ -145,8 +146,29 @@ def _write_template_library() -> None:
             file_obj.write(source_text.rstrip() + "\n")
             file_obj.write("```\n")
 
+        category = relative_template.parts[0] if relative_template.parts else "unknown"
+        matrix_rows.append(
+            (
+                category,
+                relative_template.as_posix(),
+                f"cp {relative_source.as_posix()} your_experiment.py",
+            )
+        )
+
         template_nav[nav_parts] = doc_path.relative_to(docs_root).as_posix()
         mkdocs_gen_files.set_edit_path(doc_path, relative_source)
+
+    with mkdocs_gen_files.open(docs_root / "matrix.md", "w") as file_obj:
+        file_obj.write("# 场景复制矩阵\n\n")
+        file_obj.write("| 场景分类 | 模板路径 | 复制命令 |\n")
+        file_obj.write("| --- | --- | --- |\n")
+        for category, template_path, copy_cmd in sorted(matrix_rows):
+            file_obj.write(f"| `{category}` | `{template_path}` | `{copy_cmd}` |\n")
+    template_nav[("场景复制矩阵",)] = "matrix.md"
+    mkdocs_gen_files.set_edit_path(
+        docs_root / "matrix.md",
+        (TEMPLATE_DIR / "README.md").relative_to(ROOT),
+    )
 
     with mkdocs_gen_files.open(docs_root / "SUMMARY.md", "w") as nav_file:
         nav_file.writelines(template_nav.build_literate_nav())

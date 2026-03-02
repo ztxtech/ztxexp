@@ -149,6 +149,46 @@ class ExpManager:
         self._configs = expanded
         return self
 
+    def random_search(
+        self,
+        space: Mapping[str, Sequence[Any]],
+        n_trials: int,
+        seed: int = 42,
+    ) -> "ExpManager":
+        """按随机采样方式扩展配置。
+
+        Args:
+            space: 参数搜索空间，值为候选列表。
+            n_trials: 采样次数。
+            seed: 随机种子。
+
+        Returns:
+            ExpManager: 返回自身，支持链式调用。
+
+        Notes:
+            - 采样采用“有放回”策略；
+            - 不替代 ``grid/variants``，可与其组合使用。
+        """
+        if not space or n_trials <= 0:
+            return self
+
+        rng = random.Random(seed)
+        keys = list(space.keys())
+        value_lists = [list(space[key]) for key in keys]
+
+        expanded: list[ConfigDict] = []
+        for base_config in self._configs:
+            for _ in range(n_trials):
+                next_config = copy.deepcopy(base_config)
+                for key, values in zip(keys, value_lists):
+                    if not values:
+                        continue
+                    next_config[key] = rng.choice(values)
+                expanded.append(next_config)
+
+        self._configs = expanded
+        return self
+
     def modify(self, modifier: Modifier) -> "ExpManager":
         """注册配置修改器。
 
@@ -292,6 +332,15 @@ class ExpManager:
     def get_configs(self) -> list[ConfigDict]:
         """``build`` 的兼容别名。"""
         return self.build()
+
+    def add_random_search(
+        self,
+        space: Mapping[str, Sequence[Any]],
+        n_trials: int,
+        seed: int = 42,
+    ) -> "ExpManager":
+        """``random_search`` 的兼容别名。"""
+        return self.random_search(space=space, n_trials=n_trials, seed=seed)
 
     # ---- 内部辅助函数 ----
 

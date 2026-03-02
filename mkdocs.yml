@@ -2,31 +2,59 @@ site_name: ztxexp
 site_description: 从源码注释自动生成的中文 API 文档
 repo_url: https://github.com/ztxtech/ztxexp
 repo_name: ztxtech/ztxexp
+site_author: ztxtech
 
 docs_dir: docs_src
 site_dir: docs
 
 theme:
   name: material
+  language: zh
+  logo: etc/images/logo.png
+  favicon: etc/images/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Noto Sans SC
+    code: JetBrains Mono
   palette:
-    scheme: default
-    primary: blue grey
-    accent: teal
+    - scheme: default
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色模式
+    - scheme: slate
+      primary: cyan
+      accent: lime
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
   features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
     - navigation.tabs
     - navigation.sections
+    - navigation.expand
     - navigation.top
+    - toc.follow
     - search.suggest
     - search.highlight
+    - content.code.annotate
     - content.code.copy
 
 nav:
   - 首页: index.md
+  - 迁移指南: migration-v04.zh.md
   - 示例模板库: examples-lib/
   - API 参考: reference/
 
 plugins:
-  - search
+  - search:
+      lang:
+        - zh
+        - en
   - gen-files:
       scripts:
         - scripts/gen_ref_pages.py
@@ -42,6 +70,32 @@ plugins:
             heading_level: 2
             show_signature_annotations: true
             docstring_style: google
+            separate_signature: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.snippets
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - stylesheets/extra.css
 
 watch:
   - ztxexp
