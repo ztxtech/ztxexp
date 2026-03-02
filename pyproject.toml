@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ztxexp"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
     { name = "ztxtech", email = "ztxtech@foxmail.com" },
 ]
@@ -80,6 +80,9 @@ Homepage = "https://github.com/ztxtech/ztxexp"
 Repository = "https://github.com/ztxtech/ztxexp"
 Documentation = "https://ztxexp.readthedocs.io/zh-cn/latest/"
 Issues = "https://github.com/ztxtech/ztxexp/issues"
+
+[project.scripts]
+ztxexp = "ztxexp.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.0.1 - 2026-03-02
+
+### Breaking
+
+- None.
+
+### Added
+
+- Added first-party CLI entrypoint `ztxexp` with subcommands:
+  - `ztxexp init-vibe`
+  - `ztxexp show-vibe`
+  - `ztxexp remove-vibe`
+- Added agent integration persistence module `ztxexp.vibe`:
+  - managed block markers (`<!-- ztxexp:vibe:start --> ... <!-- ztxexp:vibe:end -->`)
+  - idempotent write/update/remove behaviors
+  - profile and language rendering (`webcoding/codex/cursor/cline/copilot`, `bilingual/zh/en`)
+- Added module entrypoint support for `python -m ztxexp`.
+
+### Fixed
+
+- Added deterministic AGENTS file selection policy for cross-project initialization:
+  - reuse existing `AGENTS.md` / `agents.md` / `agents.MD`
+  - fallback create `AGENTS.md`
+
+### Docs
+
+- Added CLI usage section in README for `init-vibe/show-vibe/remove-vibe`.
+
+### Migration
+
+- Upgrade directly from `1.0.0`:
+  - `pip install -U ztxexp`
+- After upgrade, initialize agent guidance in any target project:
+  - `ztxexp init-vibe`
+
 ## 1.0.0 - 2026-03-02
 
 ### Breaking

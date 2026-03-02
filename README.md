@@ -12,6 +12,7 @@
 
 ## NEW
 
+- 2026-03-02 15:28:11 (Asia/Shanghai): 发布 `v1.0.1` CLI 能力，新增 `ztxexp init-vibe/show-vibe/remove-vibe`，可在任意目标项目中持久化写入（或移除）Agent 使用区块，支持 `profile/language/project-root/agents-file/dry-run` 参数。
 - 2026-03-02 13:40:53 (Asia/Shanghai): 版本基线升级为 `1.0.0`，用于修复历史版本号（`0.30.0` 与 `0.4.0`）导致的升级顺序歧义，确保包管理器始终选择正确的最新版本。
 - 2026-03-02 12:22:22 (Asia/Shanghai): 完成 `v0.4.0` 发布级收口，新增 CI 工作流（`ruff + pytest + mkdocs --strict + build + twine check`）与模板 smoke tests；同时修正依赖分层，`mlflow/wandb` 保持为可选 extras，不再随 `dev` 默认安装。
 - 2026-03-02 11:56:15 (Asia/Shanghai): 发布 `v0.4.0` 复现与治理闭环能力：新增 `RunMetadata/MetricEvent`、`meta.json/metrics.jsonl/events.jsonl`、`ctx.log_metric(...)`、`name/group/tags/lineage/retry/random_search/track` 等接口，并提供 `JsonlTracker` + 可选 `MlflowTracker/WandbTracker`。
@@ -68,6 +69,44 @@ pip install "ztxexp[torch]"
 ```bash
 pip install "ztxexp[excel]"
 ```
+
+### CLI：Agent 集成持久化
+
+```bash
+# 在当前项目中创建或更新受管区块（默认）
+ztxexp init-vibe
+
+# 预览将写入内容
+ztxexp show-vibe --profile webcoding --language bilingual
+
+# 写入到指定项目根目录
+ztxexp init-vibe --project-root /path/to/your-project
+
+# 显式指定目标文件（相对路径基于 project-root）
+ztxexp init-vibe --agents-file AGENTS.md
+
+# 仅预览变更，不落盘
+ztxexp init-vibe --dry-run
+
+# 移除受管区块（不影响用户自定义内容）
+ztxexp remove-vibe --project-root /path/to/your-project
+```
+
+参数说明（`init-vibe` / `remove-vibe`）：
+
+- `--project-root PATH`：目标项目目录，默认当前工作目录。
+- `--agents-file PATH`：显式目标文件；未传时按 `AGENTS.md -> agents.md -> agents.MD` 自动复用。
+- `--dry-run`：仅展示 diff，不写文件。
+
+参数说明（`init-vibe` / `show-vibe`）：
+
+- `--profile {webcoding,codex,cursor,cline,copilot}`：默认 `webcoding`。
+- `--language {bilingual,zh,en}`：默认 `bilingual`。
+
+受管区块标记：
+
+- `<!-- ztxexp:vibe:start -->`
+- `<!-- ztxexp:vibe:end -->`
 
 ### 最小示例
 
