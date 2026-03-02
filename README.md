@@ -12,17 +12,12 @@
 
 ## NEW
 
-- 2026-03-02 13:26:55 (Asia/Shanghai): 持久化 MkDocs 主题基线：固定 `material + default(indigo/indigo)`，禁用颜色切换按钮；并规范化 `mkdocs.yml` 结构，去除冗余 `theme.theme` 嵌套字段以避免后续维护歧义。
-- 2026-03-02 13:09:24 (Asia/Shanghai): 按初始方案回退 MkDocs Material 主题配置：固定单一配色 `blue grey + teal`，移除颜色切换按钮与额外主题覆盖样式；同时修复 GitHub Actions 打包步骤，`python -m build --no-isolation` 改为 `python -m build`，避免 `setuptools.build_meta` 不可用错误。
-- 2026-03-02 12:55:48 (Asia/Shanghai): 调整 MkDocs Material 视觉为“logo 同系淡紫主题”，主导航栏与链接色改为紫蓝渐变对应色，并移除过度装饰的内容背景，整体回归官方 Material 的简洁版式。
-- 2026-03-02 12:40:33 (Asia/Shanghai): 接入项目 logo：README 顶部新增品牌图，MkDocs Material 主题新增 `logo/favicon` 配置，并将图片同步到 `docs_src/etc/images/`，保证文档站点与仓库页面均可正常显示。
-- 2026-03-02 12:34:25 (Asia/Shanghai): 升级 MkDocs Material 站点视觉与交互：新增亮/暗主题切换、增强导航与代码体验、启用 `pymdownx` 扩展，并接入自定义样式 `docs_src/stylesheets/extra.css` 提升首页与 API 页可读性。
 - 2026-03-02 12:22:22 (Asia/Shanghai): 完成 `v0.4.0` 发布级收口，新增 CI 工作流（`ruff + pytest + mkdocs --strict + build + twine check`）与模板 smoke tests；同时修正依赖分层，`mlflow/wandb` 保持为可选 extras，不再随 `dev` 默认安装。
 - 2026-03-02 11:56:15 (Asia/Shanghai): 发布 `v0.4.0` 复现与治理闭环能力：新增 `RunMetadata/MetricEvent`、`meta.json/metrics.jsonl/events.jsonl`、`ctx.log_metric(...)`、`name/group/tags/lineage/retry/random_search/track` 等接口，并提供 `JsonlTracker` + 可选 `MlflowTracker/WandbTracker`。
-- 2026-03-02 01:25:15 (Asia/Shanghai): 新增 `examples/template_library` 可复制模板库（27 个场景模板），覆盖基础构建、并行调度、分析清理、ML、LLM、工程运维；并接入 MkDocs 自动生成页面（`示例模板库` 导航）。
+- 2026-03-02 01:25:15 (Asia/Shanghai): 新增 `examples/template_library` 可复制模板库（27 个场景模板），覆盖基础构建、并行调度、分析清理、ML、LLM、工程运维。
 - 2026-03-02 00:58:21 (Asia/Shanghai): 在 `ztxexp.utils` 新增 12 个高频实验工具函数，覆盖嵌套配置处理、配置差异比较、可读 run 命名、原子写入、JSONL 读写、重试调用与批处理切分。
   - 新增函数：`flatten_dict`、`unflatten_dict`、`deep_merge_dicts`、`dict_diff`、`sanitize_filename`、`build_run_name`、`split_batches`、`write_text_atomic`、`save_json_atomic`、`append_jsonl`、`load_jsonl`、`retry_call`。
-- 规则（持久化）：后续每次对项目进行功能或行为更新时，都必须在本板块追加一条记录，包含“更新时间”和“更新内容”。
+- 规则（持久化）：后续每次仅在“功能或行为”发生更新时，才在本板块追加记录；文档/样式/站点配置类变更不写入本板块。
 
 ## 问题
 
