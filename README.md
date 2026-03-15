@@ -7,6 +7,7 @@
 [![PyPI version](https://badge.fury.io/py/ztxexp.svg)](https://badge.fury.io/py/ztxexp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Versions](https://img.shields.io/pypi/pyversions/ztxexp.svg)](https://pypi.org/project/ztxexp)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ztxtech/ztxexp)
 
 `ztxexp` 是一个面向深度学习和大模型实验的抽象框架，目标是让实验迭代更快、更可复现。
 
